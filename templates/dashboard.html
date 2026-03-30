@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — JSPM Wagholi | Campus Chatbot & MindMate AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand">JSPM Wagholi</a>
+        <div class="navbar-links">
+            <a href="{{ url_for('campus_map') }}">Campus Map</a>
+            <a href="{{ url_for('contact_page') }}">Contact</a>
+            {% if session.get('role') == 'admin' %}
+            <a href="{{ url_for('admin_panel') }}">Admin</a>
+            {% endif %}
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">&#9790;</button>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-content">
+        <div class="dashboard-greeting">
+            <h2>Welcome back, {{ username }}!</h2>
+            <p>JSPM University — Wagholi Campus | Choose a chatbot to get started</p>
+        </div>
+
+        <div class="bot-cards">
+            <!-- Campus Chatbot Card — Goes to language selection first -->
+            <div class="bot-card campus" onclick="window.location.href='{{ url_for('select_language', bot='campus') }}'">
+                <div class="bot-card-icon">&#127979;</div>
+                <h3>JSPM Wagholi Chatbot</h3>
+                <p>Ask about admissions, courses, fees, hostel, placements, library, exams, and facilities at JSPM Wagholi Campus. Supports English, Hindi & Marathi.</p>
+                <button class="btn">Start Chatting &#8594;</button>
+            </div>
+
+            <!-- MindMate AI Card — Goes to language selection first -->
+            <div class="bot-card mindmate" onclick="window.location.href='{{ url_for('select_language', bot='mindmate') }}'">
+                <div class="bot-card-icon">&#128155;</div>
+                <h3>MindMate AI</h3>
+                <p>Your friendly emotional support companion. Talk about stress, anxiety, loneliness, academic pressure, or just chat. I'm here to listen, pookie! &#128155;</p>
+                <button class="btn">Talk to MindMate &#8594;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wagholi Footer -->
+    {% include 'footer_wagholi.html' %}
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>

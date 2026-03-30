@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us — JSPM Wagholi Campus</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        .contact-page { max-width: 1200px; margin: 40px auto; padding: 0 24px; }
+        .contact-header { text-align: center; margin-bottom: 48px; }
+        .contact-header h2 {
+            font-size: 32px; font-weight: 800;
+            background: linear-gradient(135deg, #6C63FF, #FF6B9D);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .contact-header p { color: var(--text-muted); font-size: 16px; margin-top: 8px; }
+        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 48px; }
+        .contact-info-cards { display: flex; flex-direction: column; gap: 20px; }
+        .contact-card {
+            background: var(--card-light); border-radius: var(--radius); padding: 24px;
+            box-shadow: var(--shadow); display: flex; gap: 16px; align-items: flex-start;
+        }
+        .contact-card-icon {
+            width: 48px; height: 48px; border-radius: 12px; display: flex;
+            align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+            background: linear-gradient(135deg, rgba(108,99,255,0.1), rgba(255,107,157,0.1));
+        }
+        .contact-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+        .contact-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+        .contact-form {
+            background: var(--card-light); border-radius: var(--radius-lg); padding: 32px;
+            box-shadow: var(--shadow);
+        }
+        .contact-form h3 { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .contact-form textarea {
+            width: 100%; padding: 14px 16px; border: 2px solid var(--border-light);
+            border-radius: var(--radius); font-size: 14px; min-height: 120px;
+            resize: vertical; font-family: inherit; background: var(--bg-light); color: var(--text-light);
+        }
+        .contact-form textarea:focus { outline: none; border-color: var(--primary); }
+        .contact-map { border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); margin-bottom: 48px; }
+        #contactMap { height: 400px; width: 100%; }
+        .form-success {
+            display: none; text-align: center; padding: 20px;
+            background: #C6F6D5; border-radius: var(--radius); color: #276749;
+        }
+        @media (max-width: 768px) {
+            .contact-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand">JSPM Wagholi</a>
+        <div class="navbar-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('campus_map') }}">Campus Map</a>
+            <a href="{{ url_for('contact_page') }}" style="color: var(--primary);">Contact</a>
+            <button class="theme-toggle" onclick="toggleTheme()">&#9790;</button>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="contact-page">
+        <div class="contact-header">
+            <h2>Contact JSPM Wagholi Campus</h2>
+            <p>Get in touch with us — we're here to help!</p>
+        </div>
+
+        <div class="contact-grid">
+            <!-- Contact Info Cards -->
+            <div class="contact-info-cards">
+                <div class="contact-card">
+                    <div class="contact-card-icon">&#128205;</div>
+                    <div>
+                        <h4>Campus Address</h4>
+                        <p>S.No. 58, Wagholi, Pune - 412207<br>Maharashtra, India<br>(Near Kesnand Road, Pune-Nagar Highway)</p>
+                    </div>
+                </div>
+                <div class="contact-card">
+                    <div class="contact-card-icon">&#128222;</div>
+                    <div>
+                        <h4>Phone Numbers</h4>
+                        <p>Main Office: +91-20-2706-0100<br>Admissions: +91-20-2706-0200<br>Placement Cell: +91-9876543211</p>
+                    </div>
+                </div>
+                <div class="contact-card">
+                    <div class="contact-card-icon">&#9993;</div>
+                    <div>
+                        <h4>Email</h4>
+                        <p>General: info@jspmwagholi.edu.in<br>Admissions: admissions@jspmwagholi.edu.in<br>Placement: placement@jspmwagholi.edu.in</p>
+                    </div>
+                </div>
+                <div class="contact-card">
+                    <div class="contact-card-icon">&#128339;</div>
+                    <div>
+                        <h4>Office Hours</h4>
+                        <p>Monday – Saturday: 9:30 AM to 5:30 PM<br>Sunday: Closed<br>Admissions helpdesk open during admission season</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="contact-form" id="contactFormContainer">
+                <h3>Send Us a Message</h3>
+                <div id="formSuccess" class="form-success">
+                    Your message has been sent successfully! We'll get back to you soon.
+                </div>
+                <form id="contactForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contactName">Your Name</label>
+                            <input type="text" id="contactName" placeholder="Full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactEmail">Email</label>
+                            <input type="email" id="contactEmail" placeholder="your@email.com" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contactPhone">Phone (optional)</label>
+                            <input type="tel" id="contactPhone" placeholder="+91-XXXXXXXXXX">
+                        </div>
+                        <div class="form-group">
+                            <label for="contactSubject">Subject</label>
+                            <input type="text" id="contactSubject" placeholder="What's this about?">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactMessage">Message</label>
+                        <textarea id="contactMessage" placeholder="Write your message here..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send Message &#10148;</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Embedded Map -->
+        <div class="contact-map">
+            <div id="contactMap"></div>
+        </div>
+    </div>
+
+    <!-- Footer (Wagholi) -->
+    {% include 'footer_wagholi.html' %}
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Contact form submission
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const payload = {
+                name: document.getElementById('contactName').value,
+                email: document.getElementById('contactEmail').value,
+                phone: document.getElementById('contactPhone').value,
+                subject: document.getElementById('contactSubject').value,
+                message: document.getElementById('contactMessage').value
+            };
+            try {
+                const res = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('contactForm').reset();
+                    document.getElementById('formSuccess').style.display = 'block';
+                    setTimeout(() => { document.getElementById('formSuccess').style.display = 'none'; }, 5000);
+                }
+            } catch (err) {
+                alert('Error sending message. Please try again.');
+            }
+        });
+
+        // Embedded map
+        const contactMap = L.map('contactMap').setView([18.5812, 73.9780], 16);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(contactMap);
+        L.marker([18.5812, 73.9780])
+            .addTo(contactMap)
+            .bindPopup('<strong>JSPM University — Wagholi Campus</strong><br>S.No. 58, Wagholi, Pune - 412207')
+            .openPopup();
+    </script>
+</body>
+</html>

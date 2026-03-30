@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Map — JSPM Wagholi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #campusMap {
+            width: 100%;
+            height: calc(100vh - 72px);
+            z-index: 1;
+        }
+        .map-legend {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            background: var(--card-light);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            max-width: 280px;
+        }
+        .map-legend h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-light);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .leaflet-popup-content h3 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #2D3748;
+        }
+        .leaflet-popup-content p {
+            font-size: 13px;
+            color: #718096;
+            margin: 0;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand">JSPM Wagholi Campus Map</a>
+        <div class="navbar-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('contact_page') }}">Contact</a>
+            <button class="theme-toggle" onclick="toggleTheme()">&#9790;</button>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Map Container -->
+    <div id="campusMap"></div>
+
+    <!-- Legend -->
+    <div class="map-legend">
+        <h4>JSPM Wagholi Campus</h4>
+        <div class="legend-item"><div class="legend-dot" style="background:#5B7FD6;"></div> Academic Buildings</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#E27070;"></div> Admin & Services</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#5EBD8A;"></div> Library & Facilities</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#E4C35A;"></div> Sports & Gym</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#E8889A;"></div> College Hostels</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#D97706;"></div> Nearby PGs (Walking Distance)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#F59E0B;"></div> Food & Eateries</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#8B5CF6;"></div> Transport / Bus Stop</div>
+        <hr style="border:none; border-top:1px solid rgba(255,255,255,0.1); margin:8px 0;">
+        <div class="legend-item" style="font-size:11px; color:#718096;">
+            <div class="legend-dot" style="background:#5B7FD6; opacity:0.3; width:16px; height:16px; border:2px dashed #5B7FD6;"></div>
+            Campus Boundary
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='js/map/wagholi_map.js') }}"></script>
+</body>
+</html>

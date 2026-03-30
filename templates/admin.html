@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel — FAQ Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand">CampusBot Admin</a>
+        <div class="navbar-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin_panel') }}" style="color: var(--primary);">FAQs</a>
+            <a href="{{ url_for('admin_analytics') }}">Analytics</a>
+            <a href="{{ url_for('admin_conversations') }}">Conversations</a>
+            <a href="{{ url_for('admin_security') }}">Security</a>
+            <button class="theme-toggle" onclick="toggleTheme()">&#9790;</button>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="admin-main">
+        <div class="admin-header">
+            <h2>FAQ Management</h2>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-primary" onclick="openAddModal()">+ Add FAQ</button>
+                <label class="btn btn-secondary" style="cursor: pointer;">
+                    Upload Dataset
+                    <input type="file" accept=".json" style="display: none;" onchange="uploadDataset(this)">
+                </label>
+            </div>
+        </div>
+
+        <!-- FAQ Table -->
+        <div class="faq-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Category</th>
+                        <th>Question (EN)</th>
+                        <th>Answer (EN)</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="faqTableBody">
+                    <tr><td colspan="6" class="text-center">Loading FAQs...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add/Edit FAQ Modal -->
+    <div class="modal-overlay" id="faqModal">
+        <div class="modal">
+            <h3 id="modalTitle">Add New FAQ</h3>
+            <input type="hidden" id="editFaqId">
+
+            <div class="form-group">
+                <label>Category</label>
+                <select class="lang-select" id="faqCategory" style="width: 100%; padding: 12px;">
+                    <option value="admissions">Admissions</option>
+                    <option value="fees">Fees</option>
+                    <option value="courses">Courses</option>
+                    <option value="hostel">Hostel</option>
+                    <option value="exams">Exams</option>
+                    <option value="placement">Placement</option>
+                    <option value="library">Library</option>
+                    <option value="facilities">Facilities</option>
+                    <option value="transportation">Transportation</option>
+                    <option value="clubs">Clubs & Activities</option>
+                    <option value="contact">Contact</option>
+                    <option value="grievance">Grievance</option>
+                    <option value="events">Events</option>
+                    <option value="general">General</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Question (English)</label>
+                <textarea id="faqQuestionEn" placeholder="Enter question in English..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Question (Hindi)</label>
+                <textarea id="faqQuestionHi" placeholder="Enter question in Hindi..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Question (Marathi)</label>
+                <textarea id="faqQuestionMr" placeholder="Enter question in Marathi..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Answer (English)</label>
+                <textarea id="faqAnswerEn" placeholder="Enter answer in English..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Answer (Hindi)</label>
+                <textarea id="faqAnswerHi" placeholder="Enter answer in Hindi..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Answer (Marathi)</label>
+                <textarea id="faqAnswerMr" placeholder="Enter answer in Marathi..."></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveFaq()">Save FAQ</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>

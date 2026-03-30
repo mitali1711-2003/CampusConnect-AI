@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard — Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand">CampusBot Admin</a>
+        <div class="navbar-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin_panel') }}">FAQs</a>
+            <a href="{{ url_for('admin_analytics') }}" style="color: var(--primary);">Analytics</a>
+            <a href="{{ url_for('admin_conversations') }}">Conversations</a>
+            <a href="{{ url_for('admin_security') }}">Security</a>
+            <button class="theme-toggle" onclick="toggleTheme()">&#9790;</button>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="admin-main">
+        <div class="admin-header">
+            <h2>Analytics Dashboard</h2>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <h4>Total Users</h4>
+                <div class="stat-value" id="totalUsers">-</div>
+            </div>
+            <div class="stat-card">
+                <h4>Total Chats</h4>
+                <div class="stat-value" id="totalChats">-</div>
+            </div>
+            <div class="stat-card">
+                <h4>Campus Queries</h4>
+                <div class="stat-value" id="campusCount">-</div>
+            </div>
+            <div class="stat-card">
+                <h4>MindMate Chats</h4>
+                <div class="stat-value" id="mindmateCount">-</div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h4>Daily Usage (Last 30 Days)</h4>
+                <canvas id="dailyChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h4>Language Distribution</h4>
+                <canvas id="langChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container mt-3">
+            <h4>Most Asked Questions</h4>
+            <div class="faq-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Query</th>
+                            <th>Bot</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topQueriesBody">
+                        <tr><td colspan="4" class="text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script>
+        // Fetch and display analytics data
+        async function loadAnalytics() {
+            try {
+                const res = await fetch('/api/admin/analytics');
+                const data = await res.json();
+
+                // Stats
+                document.getElementById('totalUsers').textContent = data.total_users;
+                document.getElementById('totalChats').textContent = data.total_chats;
+
+                let campusC = 0, mindmateC = 0;
+                data.category_stats.forEach(s => {
+                    if (s.bot_type === 'campus') campusC = s.count;
+                    if (s.bot_type === 'mindmate') mindmateC = s.count;
+                });
+                document.getElementById('campusCount').textContent = campusC;
+                document.getElementById('mindmateCount').textContent = mindmateC;
+
+                // Daily usage chart
+                const dates = [...new Set(data.daily_usage.map(d => d.date))].sort();
+                const campusData = dates.map(date => {
+                    const entry = data.daily_usage.find(d => d.date === date && d.bot_type === 'campus');
+                    return entry ? entry.count : 0;
+                });
+                const mindmateData = dates.map(date => {
+                    const entry = data.daily_usage.find(d => d.date === date && d.bot_type === 'mindmate');
+                    return entry ? entry.count : 0;
+                });
+
+                new Chart(document.getElementById('dailyChart'), {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [
+                            {
+                                label: 'Campus Bot',
+                                data: campusData,
+                                borderColor: '#6C63FF',
+                                backgroundColor: 'rgba(108, 99, 255, 0.1)',
+                                fill: true, tension: 0.4
+                            },
+                            {
+                                label: 'MindMate AI',
+                                data: mindmateData,
+                                borderColor: '#FF6B9D',
+                                backgroundColor: 'rgba(255, 107, 157, 0.1)',
+                                fill: true, tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+
+                // Language chart
+                const langLabels = data.language_stats.map(l => {
+                    const map = { en: 'English', hi: 'Hindi', mr: 'Marathi' };
+                    return map[l.language] || l.language;
+                });
+                const langCounts = data.language_stats.map(l => l.count);
+
+                new Chart(document.getElementById('langChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: langLabels,
+                        datasets: [{
+                            data: langCounts,
+                            backgroundColor: ['#6C63FF', '#FF6B9D', '#00D2FF', '#48BB78', '#ECC94B']
+                        }]
+                    },
+                    options: { responsive: true }
+                });
+
+                // Top queries
+                const tbody = document.getElementById('topQueriesBody');
+                if (data.top_queries.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center">No data yet</td></tr>';
+                } else {
+                    tbody.innerHTML = data.top_queries.map((q, i) => `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${q.query_text}</td>
+                            <td><span class="badge ${q.bot_type === 'campus' ? 'badge-primary' : 'badge-warning'}">${q.bot_type}</span></td>
+                            <td><strong>${q.count}</strong></td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Failed to load analytics:', err);
+            }
+        }
+
+        loadAnalytics();
+    </script>
+</body>
+</html>

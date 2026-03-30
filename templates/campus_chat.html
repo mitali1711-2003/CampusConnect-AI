@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSPM Wagholi Chatbot — Ask Me Anything!</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="chat-page">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <div class="chat-header-left">
+                <button class="chat-back-btn" onclick="window.location.href='{{ url_for('dashboard') }}'">&#8592;</button>
+                <div class="chat-bot-info">
+                    <h3>&#127979; JSPM Wagholi Chatbot</h3>
+                    <p>Online — Wagholi Campus Only</p>
+                </div>
+            </div>
+            <div class="chat-header-right">
+                <!-- Language switcher — syncs with session, can be changed anytime -->
+                <select class="lang-select" id="langSelect" onchange="switchLanguage(this.value)">
+                    <option value="en" {% if selected_language == 'en' %}selected{% endif %}>English</option>
+                    <option value="hi" {% if selected_language == 'hi' %}selected{% endif %}>Hindi (&#2361;&#2367;&#2344;&#2381;&#2342;&#2368;)</option>
+                    <option value="mr" {% if selected_language == 'mr' %}selected{% endif %}>Marathi (&#2350;&#2352;&#2366;&#2336;&#2368;)</option>
+                </select>
+                <button class="theme-toggle" onclick="toggleTheme()">&#9790;</button>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="chat-messages campus-bg" id="chatMessages">
+            <!-- Welcome Message -->
+            <div class="message bot">
+                <div class="message-avatar">&#129302;</div>
+                <div>
+                    <div class="message-bubble" id="welcomeMsg">
+                        <!-- Set by JS based on selected language -->
+                    </div>
+                    <div class="message-time" id="welcomeTime"></div>
+                </div>
+            </div>
+
+            <!-- Suggestions -->
+            <div class="suggestions-container" id="suggestionsContainer">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Typing Indicator -->
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="chat-input-area">
+            <div class="chat-input-wrapper">
+                <button class="chat-btn voice-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice input">&#127908;</button>
+                <input type="text" class="chat-input" id="chatInput" placeholder="Ask about JSPM Wagholi..." autocomplete="off">
+                <button class="chat-btn send-btn" id="sendBtn" onclick="sendMessage()" title="Send">&#10148;</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+    <script>
+        // Initialize campus chat with session language
+        const BOT_TYPE = 'campus';
+        const API_URL = '/api/chat/campus';
+        const SESSION_LANG = '{{ selected_language }}';
+
+        // Welcome messages by language
+        const welcomeMessages = {
+            en: "Hello! I'm the JSPM Wagholi Campus Chatbot. I can answer questions about admissions, courses, fees, hostel, placements, library, facilities, and more — all specific to JSPM Wagholi Campus. How can I help you?",
+            hi: "नमस्ते! मैं JSPM वाघोली कैंपस चैटबॉट हूं। मैं प्रवेश, पाठ्यक्रम, शुल्क, छात्रावास, प्लेसमेंट, पुस्तकालय, सुविधाओं और अन्य के बारे में प्रश्नों का उत्तर दे सकता हूं — सब कुछ JSPM वाघोली कैंपस के लिए। मैं आपकी कैसे मदद कर सकता हूं?",
+            mr: "नमस्कार! मी JSPM वाघोली कॅम्पस चॅटबॉट आहे. मी प्रवेश, अभ्यासक्रम, शुल्क, वसतिगृह, प्लेसमेंट, ग्रंथालय, सुविधा आणि बरेच काही — सर्व JSPM वाघोली कॅम्पससाठी प्रश्नांची उत्तरे देऊ शकतो. मी तुम्हाला कशी मदत करू शकतो?"
+        };
+
+        document.getElementById('welcomeMsg').textContent = welcomeMessages[SESSION_LANG] || welcomeMessages.en;
+        document.getElementById('welcomeTime').textContent = formatTime(new Date());
+
+        // Switch language and update session
+        async function switchLanguage(lang) {
+            await fetch('/api/set-language', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ language: lang })
+            });
+            loadSuggestions();
+        }
+
+        loadSuggestions();
+    </script>
+</body>
+</html>

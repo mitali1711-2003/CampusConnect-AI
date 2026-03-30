@@ -1,0 +1,256 @@
+{
+  "campus": "Default University",
+  "version": "1.0",
+  "faqs": [
+    {
+      "id": 1,
+      "category": "admissions",
+      "question_en": "What is the admission process?",
+      "question_hi": "प्रवेश प्रक्रिया क्या है?",
+      "question_mr": "प्रवेश प्रक्रिया काय आहे?",
+      "answer_en": "The admission process includes filling the online application form, submitting required documents, appearing for the entrance exam, and attending the counseling session. Visit the admissions portal for more details.",
+      "answer_hi": "प्रवेश प्रक्रिया में ऑनलाइन आवेदन पत्र भरना, आवश्यक दस्तावेज जमा करना, प्रवेश परीक्षा देना और काउंसलिंग सत्र में भाग लेना शामिल है। अधिक जानकारी के लिए प्रवेश पोर्टल पर जाएं।",
+      "answer_mr": "प्रवेश प्रक्रियेत ऑनलाइन अर्ज भरणे, आवश्यक कागदपत्रे सादर करणे, प्रवेश परीक्षा देणे आणि समुपदेशन सत्रात उपस्थित राहणे समाविष्ट आहे. अधिक माहितीसाठी प्रवेश पोर्टलला भेट द्या."
+    },
+    {
+      "id": 2,
+      "category": "admissions",
+      "question_en": "What are the eligibility criteria for admission?",
+      "question_hi": "प्रवेश के लिए पात्रता मानदंड क्या हैं?",
+      "question_mr": "प्रवेशासाठी पात्रता निकष काय आहेत?",
+      "answer_en": "Eligibility criteria vary by program. Generally, you need a minimum of 50% in your previous qualifying examination. Reserved category students get relaxation as per government norms.",
+      "answer_hi": "पात्रता मानदंड कार्यक्रम के अनुसार भिन्न होते हैं। सामान्यतः, आपको पिछली अर्हता परीक्षा में न्यूनतम 50% अंक चाहिए। आरक्षित श्रेणी के छात्रों को सरकारी मानदंडों के अनुसार छूट मिलती है।",
+      "answer_mr": "पात्रता निकष कार्यक्रमानुसार बदलतात. साधारणपणे, तुमच्या मागील पात्रता परीक्षेत किमान 50% आवश्यक आहे. आरक्षित प्रवर्गातील विद्यार्थ्यांना सरकारी नियमांनुसार सवलत मिळते."
+    },
+    {
+      "id": 3,
+      "category": "admissions",
+      "question_en": "What is the last date for admission?",
+      "question_hi": "प्रवेश की अंतिम तिथि क्या है?",
+      "question_mr": "प्रवेशाची शेवटची तारीख कोणती आहे?",
+      "answer_en": "The last date for admission varies each year. Generally, admissions close by the end of July for the academic year. Please check the official website for the exact deadline.",
+      "answer_hi": "प्रवेश की अंतिम तिथि हर वर्ष भिन्न होती है। सामान्यतः, शैक्षणिक वर्ष के लिए जुलाई के अंत तक प्रवेश बंद हो जाते हैं। कृपया सटीक समय सीमा के लिए आधिकारिक वेबसाइट देखें।",
+      "answer_mr": "प्रवेशाची शेवटची तारीख दरवर्षी बदलते. साधारणपणे, शैक्षणिक वर्षासाठी जुलैच्या अखेरीस प्रवेश बंद होतात. कृपया अचूक मुदतीसाठी अधिकृत वेबसाइट तपासा."
+    },
+    {
+      "id": 4,
+      "category": "fees",
+      "question_en": "What is the fee structure?",
+      "question_hi": "शुल्क संरचना क्या है?",
+      "question_mr": "शुल्क रचना काय आहे?",
+      "answer_en": "The fee structure depends on the course selected. Tuition fees range from ₹50,000 to ₹2,00,000 per year. Additional charges include library fees, lab fees, and examination fees. Scholarships are available for meritorious students.",
+      "answer_hi": "शुल्क संरचना चयनित पाठ्यक्रम पर निर्भर करती है। ट्यूशन फीस ₹50,000 से ₹2,00,000 प्रति वर्ष तक होती है। अतिरिक्त शुल्क में पुस्तकालय शुल्क, प्रयोगशाला शुल्क और परीक्षा शुल्क शामिल हैं। मेधावी छात्रों के लिए छात्रवृत्तियां उपलब्ध हैं।",
+      "answer_mr": "शुल्क रचना निवडलेल्या अभ्यासक्रमावर अवलंबून असते. शिक्षण शुल्क दरवर्षी ₹50,000 ते ₹2,00,000 पर्यंत असते. अतिरिक्त शुल्कांमध्ये ग्रंथालय शुल्क, प्रयोगशाळा शुल्क आणि परीक्षा शुल्क समाविष्ट आहेत. गुणवंत विद्यार्थ्यांसाठी शिष्यवृत्ती उपलब्ध आहेत."
+    },
+    {
+      "id": 5,
+      "category": "fees",
+      "question_en": "Are there any scholarships available?",
+      "question_hi": "क्या कोई छात्रवृत्तियां उपलब्ध हैं?",
+      "question_mr": "काही शिष्यवृत्ती उपलब्ध आहेत का?",
+      "answer_en": "Yes! We offer merit-based scholarships, need-based financial aid, sports scholarships, and government scholarships (SC/ST/OBC). Apply through the scholarship portal on our website.",
+      "answer_hi": "हां! हम मेरिट-आधारित छात्रवृत्तियां, आवश्यकता-आधारित वित्तीय सहायता, खेल छात्रवृत्तियां और सरकारी छात्रवृत्तियां (SC/ST/OBC) प्रदान करते हैं। हमारी वेबसाइट पर छात्रवृत्ति पोर्टल के माध्यम से आवेदन करें।",
+      "answer_mr": "होय! आम्ही गुणवत्ता-आधारित शिष्यवृत्ती, गरज-आधारित आर्थिक सहाय्य, क्रीडा शिष्यवृत्ती आणि सरकारी शिष्यवृत्ती (SC/ST/OBC) देतो. आमच्या वेबसाइटवरील शिष्यवृत्ती पोर्टलद्वारे अर्ज करा."
+    },
+    {
+      "id": 6,
+      "category": "fees",
+      "question_en": "What are the payment methods for fees?",
+      "question_hi": "शुल्क भुगतान के तरीके क्या हैं?",
+      "question_mr": "शुल्क भरण्याच्या पद्धती कोणत्या आहेत?",
+      "answer_en": "Fees can be paid through online banking, UPI, credit/debit cards, demand draft, or at the college fee counter. EMI options are also available for select courses.",
+      "answer_hi": "शुल्क ऑनलाइन बैंकिंग, UPI, क्रेडिट/डेबिट कार्ड, डिमांड ड्राफ्ट, या कॉलेज शुल्क काउंटर पर भुगतान किया जा सकता है। चुनिंदा पाठ्यक्रमों के लिए EMI विकल्प भी उपलब्ध हैं।",
+      "answer_mr": "शुल्क ऑनलाइन बँकिंग, UPI, क्रेडिट/डेबिट कार्ड, डिमांड ड्राफ्ट, किंवा कॉलेज शुल्क काउंटरवर भरता येतात. निवडक अभ्यासक्रमांसाठी EMI पर्यायही उपलब्ध आहेत."
+    },
+    {
+      "id": 7,
+      "category": "courses",
+      "question_en": "What courses are offered?",
+      "question_hi": "कौन से पाठ्यक्रम उपलब्ध हैं?",
+      "question_mr": "कोणते अभ्यासक्रम उपलब्ध आहेत?",
+      "answer_en": "We offer undergraduate programs (B.Tech, BCA, BBA, B.Sc, BA), postgraduate programs (M.Tech, MCA, MBA, M.Sc, MA), diploma courses, and certificate programs in various fields including Engineering, Management, Science, and Arts.",
+      "answer_hi": "हम स्नातक कार्यक्रम (B.Tech, BCA, BBA, B.Sc, BA), स्नातकोत्तर कार्यक्रम (M.Tech, MCA, MBA, M.Sc, MA), डिप्लोमा पाठ्यक्रम और प्रमाणपत्र कार्यक्रम प्रदान करते हैं जो इंजीनियरिंग, प्रबंधन, विज्ञान और कला सहित विभिन्न क्षेत्रों में हैं।",
+      "answer_mr": "आम्ही पदवी कार्यक्रम (B.Tech, BCA, BBA, B.Sc, BA), पदव्युत्तर कार्यक्रम (M.Tech, MCA, MBA, M.Sc, MA), डिप्लोमा अभ्यासक्रम आणि प्रमाणपत्र कार्यक्रम अभियांत्रिकी, व्यवस्थापन, विज्ञान आणि कला यासह विविध क्षेत्रांमध्ये देतो."
+    },
+    {
+      "id": 8,
+      "category": "courses",
+      "question_en": "What is the duration of B.Tech program?",
+      "question_hi": "B.Tech कार्यक्रम की अवधि क्या है?",
+      "question_mr": "B.Tech कार्यक्रमाचा कालावधी किती आहे?",
+      "answer_en": "The B.Tech program is a 4-year full-time undergraduate degree program divided into 8 semesters. Lateral entry students can join in the second year.",
+      "answer_hi": "B.Tech कार्यक्रम 4 वर्ष का पूर्णकालिक स्नातक डिग्री कार्यक्रम है जो 8 सेमेस्टर में विभाजित है। लेटरल एंट्री छात्र दूसरे वर्ष में शामिल हो सकते हैं।",
+      "answer_mr": "B.Tech कार्यक्रम हा 4 वर्षांचा पूर्णवेळ पदवी कार्यक्रम आहे जो 8 सत्रांमध्ये विभागलेला आहे. लॅटरल एंट्री विद्यार्थी दुसऱ्या वर्षात सामील होऊ शकतात."
+    },
+    {
+      "id": 9,
+      "category": "hostel",
+      "question_en": "Is hostel facility available?",
+      "question_hi": "क्या छात्रावास की सुविधा उपलब्ध है?",
+      "question_mr": "वसतिगृहाची सुविधा उपलब्ध आहे का?",
+      "answer_en": "Yes, separate hostel facilities are available for boys and girls. Hostels are equipped with WiFi, mess, laundry, gym, and 24/7 security. Room types include single, double, and triple sharing.",
+      "answer_hi": "हां, लड़कों और लड़कियों के लिए अलग-अलग छात्रावास सुविधाएं उपलब्ध हैं। छात्रावासों में WiFi, मेस, लॉन्ड्री, जिम और 24/7 सुरक्षा की सुविधा है। कमरे के प्रकार में सिंगल, डबल और ट्रिपल शेयरिंग शामिल हैं।",
+      "answer_mr": "होय, मुला आणि मुलींसाठी स्वतंत्र वसतिगृह सुविधा उपलब्ध आहेत. वसतिगृहांमध्ये WiFi, मेस, लॉन्ड्री, जिम आणि 24/7 सुरक्षा सुविधा आहे. खोल्यांचे प्रकार सिंगल, डबल आणि ट्रिपल शेअरिंग आहेत."
+    },
+    {
+      "id": 10,
+      "category": "hostel",
+      "question_en": "What is the hostel fee?",
+      "question_hi": "छात्रावास शुल्क क्या है?",
+      "question_mr": "वसतिगृहाचे शुल्क किती आहे?",
+      "answer_en": "Hostel fees range from ₹30,000 to ₹80,000 per year depending on the room type. This includes accommodation, mess charges, and basic amenities.",
+      "answer_hi": "छात्रावास शुल्क कमरे के प्रकार के आधार पर ₹30,000 से ₹80,000 प्रति वर्ष तक होता है। इसमें आवास, मेस शुल्क और बुनियादी सुविधाएं शामिल हैं।",
+      "answer_mr": "वसतिगृहाचे शुल्क खोलीच्या प्रकारानुसार दरवर्षी ₹30,000 ते ₹80,000 पर्यंत असते. यामध्ये निवास, मेस शुल्क आणि मूलभूत सुविधांचा समावेश आहे."
+    },
+    {
+      "id": 11,
+      "category": "exams",
+      "question_en": "When are the semester exams held?",
+      "question_hi": "सेमेस्टर परीक्षाएं कब आयोजित होती हैं?",
+      "question_mr": "सत्र परीक्षा कधी होतात?",
+      "answer_en": "Semester exams are held twice a year — in May/June (even semester) and November/December (odd semester). The exact schedule is published on the university website one month before exams.",
+      "answer_hi": "सेमेस्टर परीक्षाएं साल में दो बार आयोजित होती हैं — मई/जून (सम सेमेस्टर) और नवंबर/दिसंबर (विषम सेमेस्टर) में। सटीक कार्यक्रम परीक्षा से एक महीने पहले विश्वविद्यालय की वेबसाइट पर प्रकाशित किया जाता है।",
+      "answer_mr": "सत्र परीक्षा वर्षातून दोनदा होतात — मे/जून (सम सत्र) आणि नोव्हेंबर/डिसेंबर (विषम सत्र) मध्ये. अचूक वेळापत्रक परीक्षेच्या एक महिना आधी विद्यापीठाच्या वेबसाइटवर प्रकाशित केले जाते."
+    },
+    {
+      "id": 12,
+      "category": "exams",
+      "question_en": "How can I check my exam results?",
+      "question_hi": "मैं अपने परीक्षा परिणाम कैसे देख सकता हूं?",
+      "question_mr": "मी माझे परीक्षा निकाल कसे तपासू शकतो?",
+      "answer_en": "Exam results are published on the university's official website. You can also check results through the student portal using your enrollment number and date of birth.",
+      "answer_hi": "परीक्षा परिणाम विश्वविद्यालय की आधिकारिक वेबसाइट पर प्रकाशित किए जाते हैं। आप अपने नामांकन संख्या और जन्म तिथि का उपयोग करके छात्र पोर्टल के माध्यम से भी परिणाम देख सकते हैं।",
+      "answer_mr": "परीक्षा निकाल विद्यापीठाच्या अधिकृत वेबसाइटवर प्रकाशित केले जातात. तुम्ही तुमच्या नोंदणी क्रमांक आणि जन्मतारीख वापरून विद्यार्थी पोर्टलद्वारे देखील निकाल तपासू शकता."
+    },
+    {
+      "id": 13,
+      "category": "exams",
+      "question_en": "What is the passing criteria?",
+      "question_hi": "उत्तीर्ण होने के मानदंड क्या हैं?",
+      "question_mr": "उत्तीर्ण होण्याचे निकष काय आहेत?",
+      "answer_en": "Students need a minimum of 40% marks in each subject (theory and practical separately) to pass. An overall CGPA of 4.0 out of 10 is required for graduation.",
+      "answer_hi": "उत्तीर्ण होने के लिए छात्रों को प्रत्येक विषय (सिद्धांत और प्रायोगिक अलग-अलग) में न्यूनतम 40% अंक चाहिए। स्नातक के लिए 10 में से 4.0 का समग्र CGPA आवश्यक है।",
+      "answer_mr": "उत्तीर्ण होण्यासाठी विद्यार्थ्यांना प्रत्येक विषयात (सिद्धांत आणि प्रात्यक्षिक स्वतंत्रपणे) किमान 40% गुण आवश्यक आहेत. पदवीसाठी 10 पैकी 4.0 एकूण CGPA आवश्यक आहे."
+    },
+    {
+      "id": 14,
+      "category": "placement",
+      "question_en": "Does the college provide placement assistance?",
+      "question_hi": "क्या कॉलेज प्लेसमेंट सहायता प्रदान करता है?",
+      "question_mr": "कॉलेज प्लेसमेंट सहाय्य प्रदान करते का?",
+      "answer_en": "Yes, we have a dedicated Training & Placement Cell that organizes campus drives, mock interviews, resume workshops, and soft skills training. Top recruiters include TCS, Infosys, Wipro, Accenture, and many more.",
+      "answer_hi": "हां, हमारे पास एक समर्पित प्रशिक्षण और प्लेसमेंट सेल है जो कैंपस ड्राइव, मॉक इंटरव्यू, रिज्यूमे वर्कशॉप और सॉफ्ट स्किल्स ट्रेनिंग आयोजित करता है। शीर्ष भर्तीकर्ताओं में TCS, Infosys, Wipro, Accenture और कई अन्य शामिल हैं।",
+      "answer_mr": "होय, आमच्याकडे समर्पित प्रशिक्षण आणि प्लेसमेंट सेल आहे जो कॅम्पस ड्राइव्ह, मॉक इंटरव्ह्यू, रिझ्युमे कार्यशाळा आणि सॉफ्ट स्किल्स प्रशिक्षण आयोजित करते. प्रमुख भरतीकर्त्यांमध्ये TCS, Infosys, Wipro, Accenture आणि इतर अनेक समाविष्ट आहेत."
+    },
+    {
+      "id": 15,
+      "category": "placement",
+      "question_en": "What is the average placement package?",
+      "question_hi": "औसत प्लेसमेंट पैकेज क्या है?",
+      "question_mr": "सरासरी प्लेसमेंट पॅकेज किती आहे?",
+      "answer_en": "The average placement package is ₹4.5 LPA. The highest package last year was ₹18 LPA. Over 80% of eligible students get placed through campus recruitment.",
+      "answer_hi": "औसत प्लेसमेंट पैकेज ₹4.5 LPA है। पिछले वर्ष का सर्वोच्च पैकेज ₹18 LPA था। 80% से अधिक पात्र छात्र कैंपस भर्ती के माध्यम से प्लेस होते हैं।",
+      "answer_mr": "सरासरी प्लेसमेंट पॅकेज ₹4.5 LPA आहे. गेल्या वर्षीचे सर्वोच्च पॅकेज ₹18 LPA होते. 80% पेक्षा जास्त पात्र विद्यार्थी कॅम्पस भरतीद्वारे प्लेस होतात."
+    },
+    {
+      "id": 16,
+      "category": "library",
+      "question_en": "What are the library timings?",
+      "question_hi": "पुस्तकालय का समय क्या है?",
+      "question_mr": "ग्रंथालयाची वेळ काय आहे?",
+      "answer_en": "The library is open from 8:00 AM to 9:00 PM on weekdays and 9:00 AM to 5:00 PM on weekends. During exam periods, extended hours till 11:00 PM are available.",
+      "answer_hi": "पुस्तकालय कार्यदिवसों में सुबह 8:00 बजे से रात 9:00 बजे तक और सप्ताहांत में सुबह 9:00 बजे से शाम 5:00 बजे तक खुला रहता है। परीक्षा अवधि के दौरान रात 11:00 बजे तक विस्तारित समय उपलब्ध है।",
+      "answer_mr": "ग्रंथालय आठवड्याच्या दिवशी सकाळी 8:00 ते रात्री 9:00 आणि शनिवार-रविवारी सकाळी 9:00 ते संध्याकाळी 5:00 पर्यंत उघडे असते. परीक्षेच्या काळात रात्री 11:00 पर्यंत वाढीव वेळ उपलब्ध आहे."
+    },
+    {
+      "id": 17,
+      "category": "library",
+      "question_en": "How many books can I borrow?",
+      "question_hi": "मैं कितनी पुस्तकें उधार ले सकता हूं?",
+      "question_mr": "मी किती पुस्तके उधार घेऊ शकतो?",
+      "answer_en": "Undergraduate students can borrow up to 3 books for 14 days. Postgraduate students can borrow up to 5 books for 21 days. Faculty members can borrow up to 10 books.",
+      "answer_hi": "स्नातक छात्र 14 दिनों के लिए 3 पुस्तकें उधार ले सकते हैं। स्नातकोत्तर छात्र 21 दिनों के लिए 5 पुस्तकें उधार ले सकते हैं। शिक्षक सदस्य 10 पुस्तकें उधार ले सकते हैं।",
+      "answer_mr": "पदवी विद्यार्थी 14 दिवसांसाठी 3 पुस्तके उधार घेऊ शकतात. पदव्युत्तर विद्यार्थी 21 दिवसांसाठी 5 पुस्तके उधार घेऊ शकतात. प्राध्यापक सदस्य 10 पुस्तके उधार घेऊ शकतात."
+    },
+    {
+      "id": 18,
+      "category": "facilities",
+      "question_en": "What sports facilities are available?",
+      "question_hi": "कौन सी खेल सुविधाएं उपलब्ध हैं?",
+      "question_mr": "कोणत्या क्रीडा सुविधा उपलब्ध आहेत?",
+      "answer_en": "We have a cricket ground, football field, basketball and volleyball courts, badminton courts, table tennis, swimming pool, and a fully equipped gymnasium. Annual sports events are organized.",
+      "answer_hi": "हमारे पास क्रिकेट मैदान, फुटबॉल मैदान, बास्केटबॉल और वॉलीबॉल कोर्ट, बैडमिंटन कोर्ट, टेबल टेनिस, स्विमिंग पूल और पूरी तरह सुसज्जित जिम है। वार्षिक खेल आयोजन आयोजित किए जाते हैं।",
+      "answer_mr": "आमच्याकडे क्रिकेट मैदान, फुटबॉल मैदान, बास्केटबॉल आणि व्हॉलीबॉल कोर्ट, बॅडमिंटन कोर्ट, टेबल टेनिस, जलतरण तलाव आणि पूर्णपणे सुसज्ज व्यायामशाळा आहे. वार्षिक क्रीडा स्पर्धा आयोजित केल्या जातात."
+    },
+    {
+      "id": 19,
+      "category": "facilities",
+      "question_en": "Is WiFi available on campus?",
+      "question_hi": "क्या कैंपस में WiFi उपलब्ध है?",
+      "question_mr": "कॅम्पसमध्ये WiFi उपलब्ध आहे का?",
+      "answer_en": "Yes, the entire campus is WiFi-enabled with high-speed internet access. Students can connect using their student ID credentials. The network covers classrooms, labs, library, and hostels.",
+      "answer_hi": "हां, पूरा कैंपस उच्च गति इंटरनेट एक्सेस के साथ WiFi-सक्षम है। छात्र अपने छात्र आईडी क्रेडेंशियल्स का उपयोग करके कनेक्ट कर सकते हैं। नेटवर्क कक्षाओं, प्रयोगशालाओं, पुस्तकालय और छात्रावासों को कवर करता है।",
+      "answer_mr": "होय, संपूर्ण कॅम्पस हाय-स्पीड इंटरनेट ऍक्सेससह WiFi-सक्षम आहे. विद्यार्थी त्यांच्या विद्यार्थी ID क्रेडेंशियल्स वापरून कनेक्ट करू शकतात. नेटवर्क वर्गखोल्या, प्रयोगशाळा, ग्रंथालय आणि वसतिगृहे कव्हर करते."
+    },
+    {
+      "id": 20,
+      "category": "facilities",
+      "question_en": "Is there a medical facility on campus?",
+      "question_hi": "क्या कैंपस में चिकित्सा सुविधा है?",
+      "question_mr": "कॅम्पसमध्ये वैद्यकीय सुविधा आहे का?",
+      "answer_en": "Yes, the campus has a health center with a resident doctor and nurse available during college hours. Emergency first-aid is available 24/7. Nearby hospital tie-ups ensure quick access to advanced medical care.",
+      "answer_hi": "हां, कैंपस में एक स्वास्थ्य केंद्र है जहां कॉलेज के समय में निवासी डॉक्टर और नर्स उपलब्ध हैं। आपातकालीन प्राथमिक चिकित्सा 24/7 उपलब्ध है। पास के अस्पताल से संबद्धता उन्नत चिकित्सा देखभाल तक त्वरित पहुंच सुनिश्चित करती है।",
+      "answer_mr": "होय, कॅम्पसमध्ये आरोग्य केंद्र आहे जेथे कॉलेजच्या वेळेत निवासी डॉक्टर आणि नर्स उपलब्ध आहेत. आपत्कालीन प्रथमोपचार 24/7 उपलब्ध आहे. जवळच्या रुग्णालयांशी करार प्रगत वैद्यकीय सेवेत जलद प्रवेश सुनिश्चित करतो."
+    },
+    {
+      "id": 21,
+      "category": "transportation",
+      "question_en": "Does the college provide bus service?",
+      "question_hi": "क्या कॉलेज बस सेवा प्रदान करता है?",
+      "question_mr": "कॉलेज बस सेवा प्रदान करते का?",
+      "answer_en": "Yes, the college operates bus services covering major routes in the city and surrounding areas. Bus passes can be obtained from the transport office. GPS tracking is available via the college app.",
+      "answer_hi": "हां, कॉलेज शहर और आसपास के क्षेत्रों में प्रमुख मार्गों को कवर करने वाली बस सेवाएं संचालित करता है। बस पास परिवहन कार्यालय से प्राप्त किए जा सकते हैं। कॉलेज ऐप के माध्यम से GPS ट्रैकिंग उपलब्ध है।",
+      "answer_mr": "होय, कॉलेज शहरातील आणि आसपासच्या भागातील प्रमुख मार्गांवर बस सेवा चालवते. बस पास वाहतूक कार्यालयातून मिळवता येतात. कॉलेज ऍपद्वारे GPS ट्रॅकिंग उपलब्ध आहे."
+    },
+    {
+      "id": 22,
+      "category": "clubs",
+      "question_en": "What student clubs and activities are available?",
+      "question_hi": "कौन से छात्र क्लब और गतिविधियां उपलब्ध हैं?",
+      "question_mr": "कोणते विद्यार्थी क्लब आणि उपक्रम उपलब्ध आहेत?",
+      "answer_en": "We have 20+ student clubs including Coding Club, Robotics Club, Literary Club, Music Club, Dance Club, Photography Club, NSS, NCC, and Entrepreneurship Cell. Annual cultural fest 'TECHFEST' is a major highlight.",
+      "answer_hi": "हमारे पास 20+ छात्र क्लब हैं जिनमें कोडिंग क्लब, रोबोटिक्स क्लब, साहित्यिक क्लब, संगीत क्लब, डांस क्लब, फोटोग्राफी क्लब, NSS, NCC और उद्यमिता सेल शामिल हैं। वार्षिक सांस्कृतिक उत्सव 'TECHFEST' एक प्रमुख आकर्षण है।",
+      "answer_mr": "आमच्याकडे 20+ विद्यार्थी क्लब आहेत ज्यात कोडिंग क्लब, रोबोटिक्स क्लब, साहित्य क्लब, संगीत क्लब, नृत्य क्लब, फोटोग्राफी क्लब, NSS, NCC आणि उद्योजकता सेल समाविष्ट आहेत. वार्षिक सांस्कृतिक महोत्सव 'TECHFEST' हे प्रमुख आकर्षण आहे."
+    },
+    {
+      "id": 23,
+      "category": "contact",
+      "question_en": "What are the college contact details?",
+      "question_hi": "कॉलेज के संपर्क विवरण क्या हैं?",
+      "question_mr": "कॉलेजचे संपर्क तपशील काय आहेत?",
+      "answer_en": "Phone: +91-1234567890, Email: info@university.edu, Address: University Campus, Main Road, City - 411001. Office hours: Monday to Saturday, 9:00 AM to 5:00 PM.",
+      "answer_hi": "फोन: +91-1234567890, ईमेल: info@university.edu, पता: यूनिवर्सिटी कैंपस, मेन रोड, सिटी - 411001। कार्यालय समय: सोमवार से शनिवार, सुबह 9:00 बजे से शाम 5:00 बजे तक।",
+      "answer_mr": "फोन: +91-1234567890, ईमेल: info@university.edu, पत्ता: युनिव्हर्सिटी कॅम्पस, मेन रोड, सिटी - 411001. कार्यालय वेळ: सोमवार ते शनिवार, सकाळी 9:00 ते संध्याकाळी 5:00."
+    },
+    {
+      "id": 24,
+      "category": "grievance",
+      "question_en": "How do I file a complaint or grievance?",
+      "question_hi": "मैं शिकायत कैसे दर्ज करूं?",
+      "question_mr": "मी तक्रार कशी दाखल करू?",
+      "answer_en": "You can file a grievance through the online Grievance Redressal Portal on our website, or visit the Grievance Cell in the Admin Block. All complaints are addressed within 15 working days.",
+      "answer_hi": "आप हमारी वेबसाइट पर ऑनलाइन शिकायत निवारण पोर्टल के माध्यम से शिकायत दर्ज कर सकते हैं, या प्रशासन ब्लॉक में शिकायत प्रकोष्ठ में जा सकते हैं। सभी शिकायतों का 15 कार्य दिवसों में समाधान किया जाता है।",
+      "answer_mr": "तुम्ही आमच्या वेबसाइटवरील ऑनलाइन तक्रार निवारण पोर्टलद्वारे तक्रार दाखल करू शकता, किंवा प्रशासन ब्लॉकमधील तक्रार कक्षात भेट देऊ शकता. सर्व तक्रारींचे 15 कार्य दिवसांत निराकरण केले जाते."
+    },
+    {
+      "id": 25,
+      "category": "events",
+      "question_en": "What events happen on campus?",
+      "question_hi": "कैंपस में कौन से कार्यक्रम होते हैं?",
+      "question_mr": "कॅम्पसमध्ये कोणते कार्यक्रम होतात?",
+      "answer_en": "We organize TECHFEST (annual technical fest), cultural programs, sports tournaments, hackathons, workshops, guest lectures, industry visits, and national day celebrations throughout the year.",
+      "answer_hi": "हम पूरे वर्ष TECHFEST (वार्षिक तकनीकी उत्सव), सांस्कृतिक कार्यक्रम, खेल टूर्नामेंट, हैकथॉन, कार्यशालाएं, अतिथि व्याख्यान, औद्योगिक भ्रमण और राष्ट्रीय दिवस समारोह आयोजित करते हैं।",
+      "answer_mr": "आम्ही वर्षभर TECHFEST (वार्षिक तांत्रिक महोत्सव), सांस्कृतिक कार्यक्रम, क्रीडा स्पर्धा, हॅकेथॉन, कार्यशाळा, अतिथी व्याख्याने, औद्योगिक भेटी आणि राष्ट्रीय दिन समारंभ आयोजित करतो."
+    }
+  ]
+}

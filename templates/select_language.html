@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Language — JSPM Wagholi Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .lang-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: url('/static/images/campus-bg.jpg') center/cover no-repeat fixed;
+            position: relative;
+        }
+        .lang-page::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(30, 34, 53, 0.72) 0%, rgba(91, 127, 214, 0.45) 100%);
+        }
+        .lang-container {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 24px;
+            padding: 48px 40px;
+            width: 500px;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            max-width: 90vw;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            text-align: center;
+            animation: slideUp 0.6s ease;
+        }
+        .lang-container h2 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #3D5A99, #5B7FD6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .lang-container p {
+            color: #718096;
+            margin-bottom: 36px;
+            font-size: 15px;
+        }
+        .lang-options {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .lang-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 24px;
+            border: 3px solid #E2E8F0;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            text-align: left;
+        }
+        .lang-option:hover {
+            border-color: #5B7FD6;
+            transform: translateX(8px);
+            box-shadow: 0 4px 15px rgba(91, 127, 214, 0.12);
+        }
+        .lang-option.selected {
+            border-color: #5B7FD6;
+            background: linear-gradient(135deg, rgba(91, 127, 214, 0.05), rgba(232, 136, 154, 0.05));
+        }
+        .lang-flag {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: #F5F7FB;
+            flex-shrink: 0;
+        }
+        .lang-info h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2D3748;
+        }
+        .lang-info span {
+            font-size: 13px;
+            color: #718096;
+        }
+        .lang-continue {
+            margin-top: 32px;
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #5B7FD6, #4A6BBF);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .lang-continue:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(91, 127, 214, 0.35);
+        }
+        .lang-continue:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .lang-back {
+            margin-top: 16px;
+            color: #718096;
+            font-size: 14px;
+            display: inline-block;
+        }
+        .lang-back:hover { color: #5B7FD6; }
+
+        /* Mobile responsive */
+        @media (max-width: 480px) {
+            .lang-container {
+                padding: 28px 18px;
+                width: 95vw;
+            }
+            .lang-container h2 { font-size: 22px; }
+            .lang-container p { font-size: 13px; margin-bottom: 24px; }
+            .lang-option {
+                padding: 14px 16px;
+                gap: 12px;
+            }
+            .lang-flag {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            .lang-info h3 { font-size: 15px; }
+            .lang-info span { font-size: 12px; }
+            .lang-continue { padding: 14px; font-size: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-page">
+        <div class="lang-container">
+            <h2>Choose Your Language</h2>
+            <p>Select the language you'd like to chat in. You can change this anytime.</p>
+
+            <div class="lang-options">
+                <div class="lang-option" data-lang="en" onclick="selectLang(this, 'en')">
+                    <div class="lang-flag">EN</div>
+                    <div class="lang-info">
+                        <h3>English</h3>
+                        <span>Continue in English</span>
+                    </div>
+                </div>
+                <div class="lang-option" data-lang="hi" onclick="selectLang(this, 'hi')">
+                    <div class="lang-flag">&#2361;&#2367;</div>
+                    <div class="lang-info">
+                        <h3>&#2361;&#2367;&#2344;&#2381;&#2342;&#2368; (Hindi)</h3>
+                        <span>&#2361;&#2367;&#2344;&#2381;&#2342;&#2368; &#2350;&#2375;&#2306; &#2332;&#2366;&#2352;&#2368; &#2352;&#2326;&#2375;&#2306;</span>
+                    </div>
+                </div>
+                <div class="lang-option" data-lang="mr" onclick="selectLang(this, 'mr')">
+                    <div class="lang-flag">&#2350;&#2352;</div>
+                    <div class="lang-info">
+                        <h3>&#2350;&#2352;&#2366;&#2336;&#2368; (Marathi)</h3>
+                        <span>&#2350;&#2352;&#2366;&#2336;&#2368;&#2350;&#2343;&#2381;&#2351;&#2375; &#2360;&#2369;&#2352;&#2370; &#2336;&#2375;&#2357;&#2366;</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="lang-continue" id="continueBtn" onclick="continueToChat()" disabled>
+                Continue &#8594;
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="lang-back">&#8592; Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        let selectedLang = null;
+        const botType = '{{ bot_type }}';
+
+        function selectLang(el, lang) {
+            document.querySelectorAll('.lang-option').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedLang = lang;
+            document.getElementById('continueBtn').disabled = false;
+        }
+
+        async function continueToChat() {
+            if (!selectedLang) return;
+
+            // Save language to session via API
+            await fetch('/api/set-language', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ language: selectedLang })
+            });
+
+            // Redirect to the appropriate chat
+            if (botType === 'mindmate') {
+                window.location.href = '/chat/mindmate';
+            } else {
+                window.location.href = '/chat/campus';
+            }
+        }
+    </script>
+</body>
+</html>

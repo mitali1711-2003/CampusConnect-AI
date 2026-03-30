@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindMate AI — Your Friendly Pookie Companion</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="chat-page">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <div class="chat-header-left">
+                <button class="chat-back-btn" onclick="window.location.href='{{ url_for('dashboard') }}'">&#8592;</button>
+                <div class="chat-bot-info">
+                    <h3>&#128155; MindMate AI</h3>
+                    <p>Online — Your friendly pookie bestie</p>
+                </div>
+            </div>
+            <div class="chat-header-right">
+                <!-- Language switcher for MindMate too -->
+                <select class="lang-select" id="langSelect" onchange="switchLanguage(this.value)">
+                    <option value="en" {% if selected_language == 'en' %}selected{% endif %}>English</option>
+                    <option value="hi" {% if selected_language == 'hi' %}selected{% endif %}>Hindi (&#2361;&#2367;&#2344;&#2381;&#2342;&#2368;)</option>
+                    <option value="mr" {% if selected_language == 'mr' %}selected{% endif %}>Marathi (&#2350;&#2352;&#2366;&#2336;&#2368;)</option>
+                </select>
+                <button class="theme-toggle" onclick="toggleTheme()">&#9790;</button>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="chat-messages mindmate-bg" id="chatMessages">
+            <!-- Welcome Message -->
+            <div class="message bot mindmate">
+                <div class="message-avatar">&#128155;</div>
+                <div>
+                    <div class="message-bubble" id="welcomeMsg">
+                        <!-- Set by JS based on selected language -->
+                    </div>
+                    <div class="message-time" id="welcomeTime"></div>
+                </div>
+            </div>
+
+            <!-- Quick Mood Buttons -->
+            <div class="suggestions-container" id="suggestionsContainer">
+                <button class="suggestion-btn" onclick="sendQuickMessage(this)">I'm feeling stressed &#128553;</button>
+                <button class="suggestion-btn" onclick="sendQuickMessage(this)">I feel anxious &#128550;</button>
+                <button class="suggestion-btn" onclick="sendQuickMessage(this)">I'm feeling lonely &#128546;</button>
+                <button class="suggestion-btn" onclick="sendQuickMessage(this)">I need motivation &#128170;</button>
+                <button class="suggestion-btn" onclick="sendQuickMessage(this)">I'm sad today &#128557;</button>
+                <button class="suggestion-btn" onclick="sendQuickMessage(this)">Can't sleep &#128564;</button>
+                <button class="suggestion-btn" onclick="sendQuickMessage(this)">Exam stress &#128218;</button>
+                <button class="suggestion-btn" onclick="sendQuickMessage(this)">Just want to talk &#128522;</button>
+            </div>
+
+            <!-- Typing Indicator -->
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+            MindMate AI is your emotional support bestie, not a licensed therapist. If in crisis: iCall (9152987821) | Vandrevala Foundation (1860-2662-345) | JSPM Wagholi Counseling Cell
+        </div>
+
+        <!-- Chat Input -->
+        <div class="chat-input-area">
+            <div class="chat-input-wrapper">
+                <button class="chat-btn voice-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice input">&#127908;</button>
+                <input type="text" class="chat-input" id="chatInput" placeholder="How are you feeling today, {{ username }}...? &#128155;" autocomplete="off">
+                <button class="chat-btn send-btn" id="sendBtn" onclick="sendMessage()" title="Send">&#10148;</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+    <script>
+        // Initialize MindMate chat
+        const BOT_TYPE = 'mindmate';
+        const API_URL = '/api/chat/mindmate';
+        const SESSION_LANG = '{{ selected_language }}';
+
+        const USERNAME = '{{ username }}';
+        const displayName = USERNAME.charAt(0).toUpperCase() + USERNAME.slice(1);
+        const welcomeMessages = {
+            en: `HIII ${displayName}!! &#128155;&#10024; I'm MindMate AI, your friendly companion! This is YOUR safe space — no judgment, just good vibes and lots of love. Whether you're stressed about exams at JSPM, feeling lonely, anxious, or just need someone to talk to — I'm RIGHT here for you. How are you really feeling today? &#129303;`,
+            hi: `हैलो ${displayName}! &#128155; मैं MindMate AI हूं, तुम्हारी दोस्त! यह तुम्हारा सुरक्षित स्थान है — कोई फैसला नहीं, बस प्यार और सहारा। चाहे तुम्हें JSPM में परीक्षा का तनाव हो, अकेलापन हो, या बस बात करनी हो — मैं यहां हूं! तुम कैसा महसूस कर रहे हो? &#129303;`,
+            mr: `हॅलो ${displayName}! &#128155; मी MindMate AI आहे, तुमची मैत्रीण! हे तुमचे सुरक्षित ठिकाण आहे — कोणताही न्याय नाही, फक्त प्रेम आणि आधार. JSPM मधील परीक्षेचा ताण असो, एकटेपणा असो, किंवा फक्त बोलायचे असो — मी इथे आहे! तुम्हाला कसे वाटत आहे? &#129303;`
+        };
+
+        document.getElementById('welcomeMsg').innerHTML = welcomeMessages[SESSION_LANG] || welcomeMessages.en;
+        document.getElementById('welcomeTime').textContent = formatTime(new Date());
+
+        async function switchLanguage(lang) {
+            await fetch('/api/set-language', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ language: lang })
+            });
+        }
+    </script>
+</body>
+</html>
