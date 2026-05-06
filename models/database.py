@@ -7,7 +7,9 @@ Configured for JSPM Wagholi Campus ONLY.
 import sqlite3
 import os
 
-DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'database', 'chatbot.db')
+# Vercel filesystem is read-only except /tmp
+DB_PATH = '/tmp/chatbot.db' if os.environ.get('VERCEL') else \
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'database', 'chatbot.db')
 
 
 def get_db():

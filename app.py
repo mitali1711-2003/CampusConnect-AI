@@ -255,15 +255,26 @@ def campus_map():
     return render_template('campus_map.html')
 
 
-MARKERS_FILE = os.path.join(os.path.dirname(__file__), 'database', 'campus_markers.json')
+_MARKERS_PKG  = os.path.join(os.path.dirname(__file__), 'database', 'campus_markers.json')
+_MARKERS_TMP  = '/tmp/campus_markers.json'
+# On Vercel the package filesystem is read-only; edits go to /tmp
+MARKERS_FILE  = _MARKERS_TMP if os.environ.get('VERCEL') else _MARKERS_PKG
+
+
+def _read_markers():
+    """Read markers from /tmp (edited copy) if present, else from package."""
+    for path in (_MARKERS_TMP, _MARKERS_PKG):
+        if os.path.exists(path):
+            with open(path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    return []
 
 
 @app.route('/api/campus-markers', methods=['GET'])
 @login_required
 def api_campus_markers():
     try:
-        with open(MARKERS_FILE, 'r', encoding='utf-8') as f:
-            return jsonify(json.load(f))
+        return jsonify(_read_markers())
     except Exception:
         return jsonify([]), 200
 
@@ -275,7 +286,8 @@ def api_admin_save_markers():
     if not isinstance(markers, list):
         return jsonify({'error': 'Expected a JSON array'}), 400
     try:
-        with open(MARKERS_FILE, 'w', encoding='utf-8') as f:
+        save_path = _MARKERS_TMP if os.environ.get('VERCEL') else _MARKERS_PKG
+        with open(save_path, 'w', encoding='utf-8') as f:
             json.dump(markers, f, ensure_ascii=False, indent=2)
         return jsonify({'success': True, 'count': len(markers)})
     except Exception as e:
