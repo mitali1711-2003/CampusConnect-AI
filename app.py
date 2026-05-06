@@ -55,6 +55,20 @@ def setup():
     """Initialize database and load JSPM Wagholi dataset."""
     init_db()
 
+    # Auto-create admin from env var (for Railway/cloud deployments without terminal)
+    admin_password = os.environ.get('ADMIN_PASSWORD')
+    if admin_password:
+        conn = get_db()
+        existing = conn.execute("SELECT id FROM users WHERE role='admin' LIMIT 1").fetchone()
+        if not existing:
+            conn.execute(
+                "INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, 'admin')",
+                ('admin', 'admin@jspmwagholi.edu.in', hash_password(admin_password))
+            )
+            conn.commit()
+            print("[INFO] Admin user created from ADMIN_PASSWORD env var")
+        conn.close()
+
     # Load ONLY Wagholi-specific dataset
     from utils.scraper import load_wagholi_data
     load_wagholi_data()
