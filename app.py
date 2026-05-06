@@ -49,6 +49,11 @@ def ratelimit_exceeded(e):
         'retry_after': 60
     }), 429
 
+
+@app.errorhandler(500)
+def internal_error(e):
+    return jsonify({'error': 'Something went wrong on our end. Please try again 💛'}), 500
+
 # ─── Initialization ───────────────────────────────────────────────
 
 def setup():
@@ -369,6 +374,7 @@ def api_campus_chat():
     result = get_campus_response(message, language=lang, campus='JSPM Wagholi')
 
     # Save to chat history and analytics
+    conn = None
     try:
         conn = get_db()
         conn.execute(
@@ -385,7 +391,8 @@ def api_campus_chat():
     except Exception as e:
         print(f"[WARN] DB write error (campus): {e}")
     finally:
-        conn.close()
+        if conn:
+            conn.close()
 
     return jsonify({
         'response': result['answer'],
@@ -408,8 +415,14 @@ def api_mindmate_chat():
         return jsonify({'error': 'Empty message'}), 400
 
     lang = session.get('language', detect_language(message))
-    result = get_mindmate_response(message, language=lang, username=session.get('username', 'friend'))
 
+    try:
+        result = get_mindmate_response(message, language=lang, username=session.get('username', 'friend'))
+    except Exception as e:
+        print(f"[ERROR] MindMate response generation failed: {e}")
+        return jsonify({'error': 'Sorry, I ran into an issue. Please try again in a moment 💛'}), 500
+
+    conn = None
     try:
         conn = get_db()
         conn.execute(
@@ -422,7 +435,6 @@ def api_mindmate_chat():
                VALUES (?, ?, ?, ?, ?)''',
             (message, 'mindmate', lang, 1.0, session['user_id'])
         )
-        # Log mood category for the profile mood tracker
         conn.execute(
             'INSERT INTO mood_logs (user_id, category) VALUES (?, ?)',
             (session['user_id'], result['category'])
@@ -431,7 +443,8 @@ def api_mindmate_chat():
     except Exception as e:
         print(f"[WARN] DB write error (mindmate): {e}")
     finally:
-        conn.close()
+        if conn:
+            conn.close()
 
     return jsonify({
         'response': result['answer'],
@@ -481,6 +494,7 @@ def api_submit_review():
     if not isinstance(rating, int) or rating < 1 or rating > 5:
         return jsonify({'error': 'Rating must be 1-5'}), 400
 
+    conn = None
     try:
         conn = get_db()
         conn.execute(
@@ -492,7 +506,8 @@ def api_submit_review():
     except Exception as e:
         print(f"[WARN] Review save error: {e}")
     finally:
-        conn.close()
+        if conn:
+            conn.close()
 
     return jsonify({'success': True, 'message': 'Thank you for your feedback!'})
 

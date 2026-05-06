@@ -135,6 +135,8 @@ async function sendMessage() {
             }
         } else if (data.error) {
             addBotMessage(data.error || 'Sorry, something went wrong. Please try again.');
+        } else {
+            addBotMessage('Sorry, I could not process that. Please try again 💛');
         }
     } catch (err) {
         hideTyping();
