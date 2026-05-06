@@ -18,6 +18,15 @@
                 </div>
             </div>
             <div class="chat-header-right">
+                <!-- Feature 12: Download Chat button -->
+                <button onclick="exportChat()" title="Download Chat" style="
+                    padding:8px 14px; border:2px solid var(--border-light); border-radius:8px;
+                    background:var(--card-light); color:var(--text-muted); font-size:12px;
+                    font-weight:600; cursor:pointer; transition:var(--transition); white-space:nowrap;
+                " onmouseenter="this.style.borderColor='var(--mindmate-primary)';this.style.color='var(--mindmate-primary)'"
+                   onmouseleave="this.style.borderColor='var(--border-light)';this.style.color='var(--text-muted)'">
+                    &#11123; Export Chat
+                </button>
                 <button class="theme-toggle" onclick="toggleTheme()">&#9790;</button>
             </div>
         </div>
@@ -28,9 +37,7 @@
             <div class="message bot mindmate">
                 <div class="message-avatar">&#128155;</div>
                 <div>
-                    <div class="message-bubble" id="welcomeMsg">
-                        <!-- Set by JS based on selected language -->
-                    </div>
+                    <div class="message-bubble" id="welcomeMsg"></div>
                     <div class="message-time" id="welcomeTime"></div>
                 </div>
             </div>
@@ -64,7 +71,8 @@
         <div class="chat-input-area">
             <div class="chat-input-wrapper">
                 <button class="chat-btn voice-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice input">&#127908;</button>
-                <input type="text" class="chat-input" id="chatInput" placeholder="How are you feeling today, {{ username }}...? &#128155;" autocomplete="off">
+                <input type="text" class="chat-input" id="chatInput"
+                       placeholder="How are you feeling today, {{ username }}...? &#128155;" autocomplete="off">
                 <button class="chat-btn send-btn" id="sendBtn" onclick="sendMessage()" title="Send">&#10148;</button>
             </div>
         </div>
@@ -72,8 +80,8 @@
 
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/session_timeout.js') }}"></script>
     <script>
-        // Initialize MindMate chat
         const BOT_TYPE = 'mindmate';
         const API_URL = '/api/chat/mindmate';
         const SESSION_LANG = 'en';

@@ -1,0 +1,40 @@
+{
+  "exams": [
+    {
+      "name": "FE Semester II KT Exam",
+      "date": "2026-05-20",
+      "branch": "All",
+      "note": "Savitribai Phule Pune University"
+    },
+    {
+      "name": "SE Semester IV KT Exam",
+      "date": "2026-05-25",
+      "branch": "All",
+      "note": "Savitribai Phule Pune University"
+    },
+    {
+      "name": "TE Semester VI KT Exam",
+      "date": "2026-06-01",
+      "branch": "All",
+      "note": "Savitribai Phule Pune University"
+    },
+    {
+      "name": "BE Semester VIII KT Exam",
+      "date": "2026-06-05",
+      "branch": "All",
+      "note": "Savitribai Phule Pune University"
+    },
+    {
+      "name": "SPPU Summer 2026 Main Exam",
+      "date": "2026-06-15",
+      "branch": "All",
+      "note": "Official SPPU Examination"
+    },
+    {
+      "name": "Revaluation Form Deadline",
+      "date": "2026-06-30",
+      "branch": "All",
+      "note": "Submit via SPPU student portal"
+    }
+  ]
+}

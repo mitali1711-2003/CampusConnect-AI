@@ -175,7 +175,8 @@ def get_campus_response(user_message, language='en', campus='JSPM Wagholi'):
                         'answer': _wagholi_fallback(language),
                         'confidence': best_score,
                         'faq_id': None,
-                        'category': 'unknown'
+                        'category': 'unknown',
+                        'did_you_mean': get_did_you_mean(user_message, language)
                     }
 
                 chosen_idx = best_idx
@@ -206,7 +207,8 @@ def get_campus_response(user_message, language='en', campus='JSPM Wagholi'):
             'answer': _wagholi_fallback(language),
             'confidence': best_score,
             'faq_id': None,
-            'category': 'unknown'
+            'category': 'unknown',
+            'did_you_mean': get_did_you_mean(user_message, language)
         }
 
     answer = best_faq.get(f'answer_{language}') or best_faq.get('answer_en', '')
@@ -214,7 +216,8 @@ def get_campus_response(user_message, language='en', campus='JSPM Wagholi'):
         'answer': answer,
         'confidence': best_score,
         'faq_id': best_faq.get('id'),
-        'category': best_faq.get('category', 'general')
+        'category': best_faq.get('category', 'general'),
+        'did_you_mean': None
     }
 
 
@@ -311,6 +314,96 @@ def get_suggested_questions(language='en', limit=5):
     sample = random.sample(_faq_data, min(limit, len(_faq_data)))
     key = f'question_{language}'
     return [faq.get(key) or faq.get('question_en', '') for faq in sample]
+
+
+def get_did_you_mean(user_message, language='en'):
+    """
+    When confidence is low, find the closest FAQ question using difflib.
+    Returns the display question string, or None if nothing is close enough.
+    """
+    if not _faq_data:
+        return None
+
+    from difflib import get_close_matches
+
+    user_lower = user_message.lower().strip()
+    key = f'question_{language}'
+
+    # Build a map of lowercase English question -> display question
+    all_q_lower = []
+    question_map = {}
+    for faq in _faq_data:
+        q_en = faq.get('question_en', '')
+        q_display = faq.get(key) or q_en
+        if q_en:
+            q_key = q_en.lower()
+            all_q_lower.append(q_key)
+            question_map[q_key] = q_display
+
+    matches = get_close_matches(user_lower, all_q_lower, n=1, cutoff=0.4)
+    if matches:
+        return question_map.get(matches[0])
+    return None
+
+
+def search_faq_questions(query, language='en', limit=6):
+    """
+    Return FAQ questions that best match a partial query string.
+    Used for live-as-you-type suggestions in the campus chat input.
+    Falls back to keyword similarity when semantic search is unavailable.
+    """
+    global _faq_data, _faq_embeddings
+
+    if _faq_data is None:
+        load_faqs_from_db()
+
+    if not _faq_data or not query:
+        return get_suggested_questions(language=language, limit=limit)
+
+    query_lower = query.lower().strip()
+    key = f'question_{language}'
+
+    # ── Semantic path ──
+    if _USE_SEMANTIC and _faq_embeddings is not None:
+        model = get_model()
+        if model is not None:
+            try:
+                q_emb = model.encode(query, convert_to_tensor=True)
+                scores = _st_util.cos_sim(q_emb, _faq_embeddings)[0]
+                top_indices = scores.argsort(descending=True)[:limit]
+                results = []
+                for idx in top_indices:
+                    idx = int(idx)
+                    if float(scores[idx]) > 0.18:
+                        faq = _faq_data[idx]
+                        q = faq.get(key) or faq.get('question_en', '')
+                        if q:
+                            results.append(q)
+                if results:
+                    return results
+            except Exception:
+                pass
+
+    # ── Keyword / fuzzy fallback ──
+    scored = []
+    for faq in _faq_data:
+        q_en = faq.get('question_en', '').lower()
+        q_lang = faq.get(f'question_{language}', '').lower()
+        q_display = faq.get(key) or faq.get('question_en', '')
+
+        if query_lower in q_en or query_lower in q_lang:
+            score = 1.0
+        else:
+            score = max(
+                SequenceMatcher(None, query_lower, q_en).ratio(),
+                SequenceMatcher(None, query_lower, q_lang).ratio() if q_lang else 0
+            )
+
+        if score > 0.25 and q_display:
+            scored.append((score, q_display))
+
+    scored.sort(reverse=True)
+    return [q for _, q in scored[:limit]]
 
 
 def reload_faqs():

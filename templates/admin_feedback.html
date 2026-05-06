@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Feedback — Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        .stars-display { color: #F6AD55; font-size: 14px; letter-spacing: 1px; }
+        .rating-bar-wrap { display: flex; align-items: center; gap: 10px; }
+        .rating-bar-bg { flex: 1; height: 8px; border-radius: 4px; background: var(--border-light); overflow: hidden; }
+        .rating-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #F6AD55, #ED8936); transition: width 0.5s; }
+        .avg-big { font-size: 28px; font-weight: 800; color: var(--primary); }
+        .tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 2px solid var(--border-light); }
+        .tab-btn {
+            padding: 10px 20px; border: none; background: none; font-size: 14px; font-weight: 600;
+            color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px;
+        }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+        .comment-cell { max-width: 280px; font-size: 12px; color: var(--text-muted); white-space: pre-wrap; word-break: break-word; }
+        .chart-half { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
+        @media (max-width: 700px) { .chart-half { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand">CampusBot Admin</a>
+        <div class="navbar-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin_panel') }}">FAQs</a>
+            <a href="{{ url_for('admin_analytics') }}">Analytics</a>
+            <a href="{{ url_for('admin_conversations') }}">Conversations</a>
+            <a href="{{ url_for('admin_security') }}">Security</a>
+            <a href="{{ url_for('admin_canteen') }}">Canteen</a>
+            <a href="{{ url_for('admin_feedback') }}" style="color: var(--primary);">Feedback</a>
+            <a href="{{ url_for('admin_map') }}">Map</a>
+            <button class="theme-toggle" onclick="toggleTheme()">&#9790;</button>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="admin-main">
+        <div class="admin-header">
+            <h2>&#128203; Faculty Feedback Results</h2>
+        </div>
+
+        <!-- Summary stats -->
+        <div class="stats-grid" id="summaryStats">
+            <div class="stat-card">
+                <h4>Total Responses</h4>
+                <div class="stat-value" id="totalResponses">-</div>
+            </div>
+            <div class="stat-card">
+                <h4>Subjects Covered</h4>
+                <div class="stat-value" id="totalSubjects">-</div>
+            </div>
+            <div class="stat-card">
+                <h4>Overall Avg Rating</h4>
+                <div class="stat-value" id="overallAvg">-</div>
+            </div>
+            <div class="stat-card">
+                <h4>Faculty Reviewed</h4>
+                <div class="stat-value" id="totalFaculty">-</div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="chart-half">
+            <div class="chart-container">
+                <h4>Average Rating by Subject</h4>
+                <canvas id="subjectChart" height="220"></canvas>
+                <div id="subjectNoData" style="display:none; text-align:center; padding:32px; color:var(--text-muted);">No data yet</div>
+            </div>
+            <div class="chart-container">
+                <h4>Rating Distribution</h4>
+                <canvas id="distChart" height="220"></canvas>
+                <div id="distNoData" style="display:none; text-align:center; padding:32px; color:var(--text-muted);">No data yet</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('aggregated', this)">By Subject / Faculty</button>
+            <button class="tab-btn" onclick="switchTab('recent', this)">Recent Responses</button>
+        </div>
+
+        <!-- Aggregated tab -->
+        <div class="tab-panel active" id="tab-aggregated">
+            <div class="faq-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Faculty</th>
+                            <th>Avg Rating</th>
+                            <th>Responses</th>
+                            <th>Min / Max</th>
+                            <th>Rating Bar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="aggregatedBody">
+                        <tr><td colspan="6" class="text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent tab -->
+        <div class="tab-panel" id="tab-recent">
+            <div class="faq-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Faculty</th>
+                            <th>Rating</th>
+                            <th>Comment</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentBody">
+                        <tr><td colspan="5" class="text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script>
+        function switchTab(name, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('tab-' + name).classList.add('active');
+        }
+
+        function starsHtml(rating) {
+            const full = Math.round(rating);
+            return '★'.repeat(full) + '☆'.repeat(5 - full);
+        }
+
+        function ratingColor(r) {
+            if (r >= 4) return '#48BB78';
+            if (r >= 3) return '#F6AD55';
+            return '#FC8181';
+        }
+
+        async function loadFeedback() {
+            try {
+                const res = await fetch('/api/admin/feedback');
+                const data = await res.json();
+                const agg = data.aggregated || [];
+                const recent = data.recent || [];
+
+                // Summary stats
+                const totalResponses = agg.reduce((s, r) => s + r.total_responses, 0);
+                const subjects = new Set(agg.map(r => r.subject)).size;
+                const faculty = new Set(agg.map(r => r.faculty_name)).size;
+                const overallAvg = agg.length
+                    ? (agg.reduce((s, r) => s + r.avg_rating * r.total_responses, 0) / totalResponses).toFixed(2)
+                    : '-';
+                document.getElementById('totalResponses').textContent = totalResponses;
+                document.getElementById('totalSubjects').textContent = subjects;
+                document.getElementById('totalFaculty').textContent = faculty;
+                document.getElementById('overallAvg').textContent = overallAvg !== '-' ? `${overallAvg} ★` : '-';
+
+                // Aggregated table
+                if (agg.length === 0) {
+                    document.getElementById('aggregatedBody').innerHTML =
+                        '<tr><td colspan="6" class="text-center">No feedback submitted yet.</td></tr>';
+                } else {
+                    document.getElementById('aggregatedBody').innerHTML = agg.map(r => `
+                        <tr>
+                            <td><strong>${escHtml(r.subject)}</strong></td>
+                            <td>${escHtml(r.faculty_name)}</td>
+                            <td>
+                                <span style="font-size:20px; font-weight:800; color:${ratingColor(r.avg_rating)}">${r.avg_rating}</span>
+                                <span class="stars-display" style="color:${ratingColor(r.avg_rating)}">${starsHtml(r.avg_rating)}</span>
+                            </td>
+                            <td><strong>${r.total_responses}</strong></td>
+                            <td><span style="color:#48BB78">${r.min_rating}</span> / <span style="color:#FC8181">${r.max_rating}</span></td>
+                            <td>
+                                <div class="rating-bar-wrap">
+                                    <div class="rating-bar-bg"><div class="rating-bar-fill" style="width:${(r.avg_rating/5)*100}%;background:${ratingColor(r.avg_rating)}"></div></div>
+                                    <span style="font-size:11px;color:var(--text-muted)">${((r.avg_rating/5)*100).toFixed(0)}%</span>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Recent table
+                if (recent.length === 0) {
+                    document.getElementById('recentBody').innerHTML =
+                        '<tr><td colspan="5" class="text-center">No feedback yet.</td></tr>';
+                } else {
+                    document.getElementById('recentBody').innerHTML = recent.map(r => `
+                        <tr>
+                            <td>${escHtml(r.subject)}</td>
+                            <td>${escHtml(r.faculty_name)}</td>
+                            <td><span class="stars-display" style="color:${ratingColor(r.rating)}">${starsHtml(r.rating)}</span> <strong>${r.rating}</strong></td>
+                            <td class="comment-cell">${r.comment ? escHtml(r.comment) : '<em style="color:var(--text-muted)">No comment</em>'}</td>
+                            <td style="font-size:12px;color:var(--text-muted)">${r.created_at ? r.created_at.slice(0, 16) : ''}</td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Subject avg chart
+                if (agg.length > 0) {
+                    const subjectLabels = agg.map(r => r.subject + '\n' + r.faculty_name);
+                    const subjectAvgs = agg.map(r => r.avg_rating);
+                    const barColors = subjectAvgs.map(r => ratingColor(r));
+                    new Chart(document.getElementById('subjectChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: subjectLabels,
+                            datasets: [{
+                                label: 'Avg Rating',
+                                data: subjectAvgs,
+                                backgroundColor: barColors,
+                                borderRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: { y: { min: 0, max: 5, ticks: { stepSize: 1 } } },
+                            plugins: { legend: { display: false } }
+                        }
+                    });
+                } else {
+                    document.getElementById('subjectChart').style.display = 'none';
+                    document.getElementById('subjectNoData').style.display = 'block';
+                }
+
+                // Distribution chart
+                if (recent.length > 0) {
+                    const counts = [1,2,3,4,5].map(s => recent.filter(r => r.rating === s).length);
+                    new Chart(document.getElementById('distChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['1 ★', '2 ★', '3 ★', '4 ★', '5 ★'],
+                            datasets: [{
+                                label: 'Responses',
+                                data: counts,
+                                backgroundColor: ['#FC8181','#F6AD55','#ECC94B','#68D391','#48BB78'],
+                                borderRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                            plugins: { legend: { display: false } }
+                        }
+                    });
+                } else {
+                    document.getElementById('distChart').style.display = 'none';
+                    document.getElementById('distNoData').style.display = 'block';
+                }
+
+            } catch (err) {
+                console.error('Failed to load feedback data:', err);
+            }
+        }
+
+        function escHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        loadFeedback();
+    </script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canteen Menu — Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .canteen-admin { max-width: 960px; }
+        .date-row { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+        .date-row label { font-weight: 600; font-size: 14px; }
+        .date-row input[type="date"] {
+            padding: 10px 14px; border: 2px solid var(--border-light); border-radius: var(--radius);
+            font-size: 14px; background: var(--bg-light); color: var(--text-light); cursor: pointer;
+        }
+        .date-row input[type="date"]:focus { outline: none; border-color: var(--primary); }
+        .add-form {
+            background: var(--card-light); border-radius: var(--radius-lg);
+            padding: 24px 28px; box-shadow: var(--shadow); margin-bottom: 28px;
+        }
+        .add-form h3 { font-size: 16px; font-weight: 700; margin-bottom: 18px; }
+        .add-form-row { display: grid; grid-template-columns: 2fr 2fr 1fr 1fr auto; gap: 12px; align-items: end; }
+        .add-form-row .form-group { margin: 0; }
+        .add-form select, .add-form input {
+            padding: 10px 12px; border: 2px solid var(--border-light); border-radius: var(--radius);
+            font-size: 14px; background: var(--bg-light); color: var(--text-light); width: 100%;
+        }
+        .add-form select:focus, .add-form input:focus { outline: none; border-color: var(--primary); }
+        .category-section { margin-bottom: 24px; }
+        .category-title {
+            font-size: 15px; font-weight: 700; padding: 10px 0 8px;
+            border-bottom: 2px solid var(--border-light); margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .menu-item-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 16px; border-radius: var(--radius);
+            background: var(--bg-light); margin-bottom: 6px; gap: 12px;
+        }
+        .menu-item-row .item-name { font-size: 14px; font-weight: 600; flex: 1; }
+        .menu-item-row .item-price { font-size: 13px; color: var(--text-muted); }
+        .menu-item-row .delete-btn {
+            border: none; background: rgba(252,129,129,0.15); color: #C53030;
+            border-radius: 8px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .menu-item-row .delete-btn:hover { background: rgba(252,129,129,0.3); }
+        .empty-menu { text-align: center; padding: 40px; color: var(--text-muted); }
+        .save-success {
+            display: none; background: #C6F6D5; border-radius: var(--radius);
+            padding: 10px 16px; color: #276749; font-size: 13px; font-weight: 600; margin-bottom: 16px;
+        }
+        @media (max-width: 700px) { .add-form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand">CampusBot Admin</a>
+        <div class="navbar-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin_panel') }}">FAQs</a>
+            <a href="{{ url_for('admin_analytics') }}">Analytics</a>
+            <a href="{{ url_for('admin_conversations') }}">Conversations</a>
+            <a href="{{ url_for('admin_security') }}">Security</a>
+            <a href="{{ url_for('admin_canteen') }}" style="color: var(--primary);">Canteen</a>
+            <a href="{{ url_for('admin_feedback') }}">Feedback</a>
+            <a href="{{ url_for('admin_map') }}">Map</a>
+            <button class="theme-toggle" onclick="toggleTheme()">&#9790;</button>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="admin-main canteen-admin">
+        <div class="admin-header">
+            <h2>&#127869; Canteen Menu Management</h2>
+        </div>
+
+        <div class="date-row">
+            <label for="menuDate">Menu Date:</label>
+            <input type="date" id="menuDate">
+            <button class="btn btn-secondary" onclick="loadMenu()">Load Menu</button>
+        </div>
+
+        <!-- Add item form -->
+        <div class="add-form">
+            <h3>Add Menu Item</h3>
+            <div id="saveSuccess" class="save-success">Item added successfully!</div>
+            <div class="add-form-row">
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="addCategory">
+                        <option value="breakfast">&#127749; Breakfast</option>
+                        <option value="lunch" selected>&#127859; Lunch</option>
+                        <option value="snacks">&#127839; Snacks</option>
+                        <option value="dinner">&#127769; Dinner</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Item Name</label>
+                    <input type="text" id="addItemName" placeholder="e.g. Vada Pav, Samosa">
+                </div>
+                <div class="form-group">
+                    <label>Price (₹)</label>
+                    <input type="text" id="addPrice" placeholder="e.g. 20">
+                </div>
+                <div></div>
+                <button class="btn btn-primary" onclick="addItem()" style="white-space:nowrap; align-self: end;">+ Add</button>
+            </div>
+        </div>
+
+        <!-- Menu display -->
+        <div id="menuContent">
+            <div class="empty-menu">Select a date and click "Load Menu" to view or edit the canteen menu.</div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script>
+        const CAT_ICONS = { breakfast: '🌅', lunch: '🍛', snacks: '🍿', dinner: '🌙' };
+
+        // Default to today
+        (function setDefaultDate() {
+            const today = new Date().toISOString().slice(0, 10);
+            document.getElementById('menuDate').value = today;
+            loadMenu();
+        })();
+
+        async function loadMenu() {
+            const date = document.getElementById('menuDate').value;
+            if (!date) { alert('Please select a date.'); return; }
+            try {
+                const res = await fetch(`/api/admin/canteen?date=${date}`);
+                const data = await res.json();
+                renderMenu(data.items, date);
+            } catch (e) {
+                document.getElementById('menuContent').innerHTML = '<div class="empty-menu">Failed to load menu. Please try again.</div>';
+            }
+        }
+
+        function renderMenu(items, date) {
+            if (!items || items.length === 0) {
+                document.getElementById('menuContent').innerHTML =
+                    `<div class="empty-menu">No menu posted for ${date}. Add items above!</div>`;
+                return;
+            }
+            const grouped = {};
+            items.forEach(item => {
+                if (!grouped[item.category]) grouped[item.category] = [];
+                grouped[item.category].push(item);
+            });
+            const catOrder = ['breakfast', 'lunch', 'snacks', 'dinner'];
+            const sections = catOrder.filter(c => grouped[c]).map(cat => `
+                <div class="category-section">
+                    <div class="category-title">${CAT_ICONS[cat] || '🍽️'} ${cat.charAt(0).toUpperCase() + cat.slice(1)}</div>
+                    ${grouped[cat].map(item => `
+                        <div class="menu-item-row" id="item-${item.id}">
+                            <span class="item-name">${escHtml(item.item_name)}</span>
+                            <span class="item-price">${item.price ? '₹' + escHtml(item.price) : ''}</span>
+                            <button class="delete-btn" onclick="deleteItem(${item.id})">&#128465; Remove</button>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+            document.getElementById('menuContent').innerHTML = sections;
+        }
+
+        async function addItem() {
+            const date = document.getElementById('menuDate').value;
+            const category = document.getElementById('addCategory').value;
+            const itemName = document.getElementById('addItemName').value.trim();
+            const price = document.getElementById('addPrice').value.trim();
+
+            if (!date) { alert('Please select a menu date first.'); return; }
+            if (!itemName) { alert('Item name is required.'); return; }
+
+            try {
+                const res = await fetch('/api/admin/canteen', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ menu_date: date, category, item_name: itemName, price })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('addItemName').value = '';
+                    document.getElementById('addPrice').value = '';
+                    const banner = document.getElementById('saveSuccess');
+                    banner.style.display = 'block';
+                    setTimeout(() => { banner.style.display = 'none'; }, 3000);
+                    loadMenu();
+                } else {
+                    alert(data.error || 'Failed to add item.');
+                }
+            } catch (e) {
+                alert('Network error. Please try again.');
+            }
+        }
+
+        async function deleteItem(itemId) {
+            if (!confirm('Remove this menu item?')) return;
+            try {
+                const res = await fetch(`/api/admin/canteen/${itemId}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                    const row = document.getElementById(`item-${itemId}`);
+                    if (row) { row.style.opacity = '0'; row.style.transition = 'opacity 0.3s'; setTimeout(() => { row.remove(); }, 300); }
+                }
+            } catch (e) {
+                alert('Network error.');
+            }
+        }
+
+        function escHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+    </script>
+</body>
+</html>

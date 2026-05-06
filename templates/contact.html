@@ -180,14 +180,14 @@
         });
 
         // Embedded map
-        const contactMap = L.map('contactMap').setView([18.5812, 73.9780], 16);
+        const contactMap = L.map('contactMap').setView([18.5860, 74.0028], 17);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; OpenStreetMap'
         }).addTo(contactMap);
-        L.marker([18.5812, 73.9780])
+        L.marker([18.5860, 74.0028])
             .addTo(contactMap)
-            .bindPopup('<strong>JSPM University — Wagholi Campus</strong><br>S.No. 58, Wagholi, Pune - 412207')
+            .bindPopup('<strong>JSPM University — Wagholi Campus</strong><br>GAT No. 720, JSPM Road, Wagholi, Pune - 412207')
             .openPopup();
     </script>
 </body>

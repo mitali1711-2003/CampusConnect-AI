@@ -1,0 +1,219 @@
+[
+  {
+    "id": 1,
+    "coords": [18.5860973, 74.0028226],
+    "type": "academic",
+    "title": "JSPM University — Main Building",
+    "desc": "GAT No. 720, JSPM Road. BCA, BBA, B.Sc, B.Com, B.A., B.Voc, B.Des, B.Tech programs. Central university block with registrar, examination cell, and dean offices."
+  },
+  {
+    "id": 2,
+    "coords": [18.5855, 74.0025],
+    "type": "academic",
+    "title": "JSCOE — Jayawantrao Sawant College of Engineering",
+    "desc": "Departments: Computer, IT, AI&DS, AI&ML, E&TC, Mechanical, Civil, Electrical. NAAC Accredited, affiliated to SPPU."
+  },
+  {
+    "id": 3,
+    "coords": [18.5850, 74.0030],
+    "type": "academic",
+    "title": "ICOER — Imperial College of Engineering & Research",
+    "desc": "B.E./B.Tech programs. AI, ML, IoT labs. Smart classrooms, project labs, and workshop facility."
+  },
+  {
+    "id": 4,
+    "coords": [18.5865, 74.0022],
+    "type": "academic",
+    "title": "JSIMR — Institute of Management & Research",
+    "desc": "MBA program (Marketing, Finance, HR, Operations, Business Analytics). Seminar halls, case study rooms."
+  },
+  {
+    "id": 5,
+    "coords": [18.5848, 74.0020],
+    "type": "academic",
+    "title": "JSPM Pharmacy College",
+    "desc": "B.Pharm, D.Pharm, M.Pharm. Pharmaceutical labs, drug testing lab, medicinal plant garden."
+  },
+  {
+    "id": 6,
+    "coords": [18.5858, 74.0035],
+    "type": "admin",
+    "title": "Main Gate — GAT No. 720 (JSPM Road)",
+    "desc": "Campus main entrance on JSPM Road. Security check, visitor management. Admissions helpdesk. Hours: Mon-Sat 9:30 AM – 5:30 PM."
+  },
+  {
+    "id": 7,
+    "coords": [18.5863, 74.0032],
+    "type": "admin",
+    "title": "Admin Block & Accounts Office",
+    "desc": "Principal cabin, administrative offices, accounts section, scholarship cell."
+  },
+  {
+    "id": 8,
+    "coords": [18.5853, 74.0028],
+    "type": "admin",
+    "title": "Training & Placement Cell",
+    "desc": "Placement office, mock interviews, resume workshops. Top recruiters: TCS, Infosys, Wipro, Cognizant, Capgemini, Persistent."
+  },
+  {
+    "id": 9,
+    "coords": [18.5862295, 74.0039412],
+    "type": "amenity",
+    "title": "Library of BSIOTR — Central Library",
+    "desc": "50,000+ books, DELNET/IEEE/NPTEL access. Reading hall (200+ seats). Open 8 AM – 8 PM, extended to 10 PM during exams."
+  },
+  {
+    "id": 10,
+    "coords": [18.5856, 74.0020],
+    "type": "amenity",
+    "title": "Computer Center & IT Labs",
+    "desc": "500+ systems, high-speed WiFi. Labs for programming, networking, IoT, AI/ML practicals."
+  },
+  {
+    "id": 11,
+    "coords": [18.5850, 74.0025],
+    "type": "amenity",
+    "title": "Health Center & Medical Room",
+    "desc": "Resident doctor (9:30 AM – 5:30 PM), nurse on duty, first-aid 24/7. Tie-up with Sahyadri & Noble Hospital."
+  },
+  {
+    "id": 12,
+    "coords": [18.5866, 74.0026],
+    "type": "amenity",
+    "title": "Auditorium & Seminar Hall",
+    "desc": "500+ seating. Tech fests, cultural events, guest lectures, convocation, and annual functions."
+  },
+  {
+    "id": 13,
+    "coords": [18.5859604, 74.0007401],
+    "type": "sports",
+    "title": "JSPM Play Ground",
+    "desc": "Large campus ground for cricket, football, athletics. Annual sports day, inter-college tournaments held here."
+  },
+  {
+    "id": 14,
+    "coords": [18.5851541, 73.9991040],
+    "type": "sports",
+    "title": "AK Badminton Court",
+    "desc": "Professional badminton court near campus. Indoor facility for students and faculty."
+  },
+  {
+    "id": 15,
+    "coords": [18.5848, 74.0015],
+    "type": "sports",
+    "title": "Gymnasium & Fitness Center",
+    "desc": "Fully equipped gym with modern machines. Yoga and meditation center."
+  },
+  {
+    "id": 16,
+    "coords": [18.5862474, 74.0051927],
+    "type": "hostel",
+    "title": "JSPM Girls' Hostel B",
+    "desc": "On JSPM Road. Warden, CCTV, biometric entry. WiFi, mess, common room with TV. Near Library of BSIOTR."
+  },
+  {
+    "id": 17,
+    "coords": [18.5845, 74.0052],
+    "type": "hostel",
+    "title": "JSPM Girls' Hostel A",
+    "desc": "Main girls hostel. 3 buildings, 2/3/4 sharing. Solar water heating, laundry, 24/7 security. Fees: ₹45,000 – ₹80,000/year."
+  },
+  {
+    "id": 18,
+    "coords": [18.5861848, 73.9989585],
+    "type": "pg",
+    "title": "Anand Boys Hostel",
+    "desc": "Boys hostel near campus. Furnished rooms, WiFi, home-style mess. ₹6,000 – ₹10,000/month. ~4 min walk."
+  },
+  {
+    "id": 19,
+    "coords": [18.5856844, 73.9988739],
+    "type": "pg",
+    "title": "Happy Living Boys Hostel",
+    "desc": "Budget boys hostel. Single/double/triple sharing. Tiffin, WiFi, parking. ₹5,500 – ₹9,000/month. ~3 min walk."
+  },
+  {
+    "id": 20,
+    "coords": [18.5863635, 73.9996405],
+    "type": "pg",
+    "title": "Ravinanda Trinity — PG Rooms",
+    "desc": "Residential complex near playground. Multiple PG operators. Furnished rooms for boys & girls. ₹7,000 – ₹12,000/month."
+  },
+  {
+    "id": 21,
+    "coords": [18.5872451, 74.0011289],
+    "type": "pg",
+    "title": "Nyati Elan — PG & Flat Rentals",
+    "desc": "Premium complex north of campus. PG rooms, shared flats. WiFi, security, parking. ₹8,000 – ₹15,000/month."
+  },
+  {
+    "id": 22,
+    "coords": [18.5847070, 74.0006402],
+    "type": "pg",
+    "title": "Umang Pride — PG Accommodation",
+    "desc": "South of campus. PG for boys & girls (separate floors). Meals, WiFi, laundry. ₹6,500 – ₹11,000/month."
+  },
+  {
+    "id": 23,
+    "coords": [18.5852488, 73.9970220],
+    "type": "pg",
+    "title": "Gulmohar Primrose — Student PG",
+    "desc": "Apartments with PG operators. Near AK Badminton Court. Budget rooms. ₹5,000 – ₹8,000/month. ~5 min walk."
+  },
+  {
+    "id": 24,
+    "coords": [18.5853596, 74.0042453],
+    "type": "school",
+    "title": "JSPM's Prodigy Public School",
+    "desc": "K-12 school by JSPM Trust. Adjacent to university campus near JSPM Road."
+  },
+  {
+    "id": 25,
+    "coords": [18.5877172, 73.9968361],
+    "type": "school",
+    "title": "Lexikon International School",
+    "desc": "Near Nagar Road. Landmark — \"JSPM campus is south of Lexikon School, take JSPM Road.\""
+  },
+  {
+    "id": 26,
+    "coords": [18.5856, 74.0018],
+    "type": "food",
+    "title": "Campus Cafeteria & Canteen",
+    "desc": "Multi-cuisine food court inside campus. Veg & non-veg. Meals ₹40-60. Seating 200+. Open 8 AM – 7 PM."
+  },
+  {
+    "id": 27,
+    "coords": [18.5858, 74.0040],
+    "type": "food",
+    "title": "JSPM Road — Food Stalls & Chai",
+    "desc": "Chai tapris, Maggi points, vada pav, juice stalls outside the gate. Student hangout. ₹20-80."
+  },
+  {
+    "id": 28,
+    "coords": [18.5845, 74.0008],
+    "type": "food",
+    "title": "Umang Pride Area — Restaurants",
+    "desc": "Eateries, biryani shops, thali restaurants near Umang Pride. Walking distance. Budget meals ₹50-150."
+  },
+  {
+    "id": 29,
+    "coords": [18.5880, 73.9960],
+    "type": "transport",
+    "title": "Nagar Road — PMPML Bus Stop",
+    "desc": "City bus stop on Pune-Nagar Road. Routes to Pune Station, Hadapsar, Kharadi, Viman Nagar. College buses pick up here."
+  },
+  {
+    "id": 30,
+    "coords": [18.5860, 74.0043],
+    "type": "transport",
+    "title": "Auto-Rickshaw Stand (JSPM Road)",
+    "desc": "Auto stand near main gate. Shared autos to Kharadi (₹20), Viman Nagar (₹30). Ola/Uber pickup."
+  },
+  {
+    "id": 31,
+    "coords": [18.5847846, 73.9981701],
+    "type": "school",
+    "title": "Ivy Botanica (Residential)",
+    "desc": "Residential complex west of campus. Some students rent flats here. Walking distance to JSPM."
+  }
+]

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Editor — Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .map-editor { max-width: 1100px; }
+        .editor-toolbar {
+            display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .search-box {
+            flex: 1; min-width: 200px; padding: 10px 14px; border: 2px solid var(--border-light);
+            border-radius: var(--radius); font-size: 14px; background: var(--bg-light); color: var(--text-light);
+        }
+        .search-box:focus { outline: none; border-color: var(--primary); }
+        .type-filter {
+            padding: 10px 14px; border: 2px solid var(--border-light); border-radius: var(--radius);
+            font-size: 14px; background: var(--bg-light); color: var(--text-light); cursor: pointer;
+        }
+        .type-filter:focus { outline: none; border-color: var(--primary); }
+        .marker-table table { width: 100%; }
+        .marker-table th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .marker-table td { vertical-align: top; padding: 10px 12px; }
+        .editable-cell { position: relative; }
+        .editable-title, .editable-desc {
+            width: 100%; border: 2px solid transparent; border-radius: 6px; padding: 6px 8px;
+            font-size: 13px; font-family: inherit; background: transparent; color: var(--text-light);
+            resize: none; line-height: 1.5; transition: border-color 0.15s, background 0.15s;
+        }
+        .editable-title { font-weight: 600; height: 36px; }
+        .editable-desc { min-height: 60px; }
+        .editable-title:focus, .editable-desc:focus {
+            outline: none; border-color: var(--primary); background: var(--bg-light);
+        }
+        .editable-title.dirty, .editable-desc.dirty { border-color: #F6AD55; background: rgba(246,173,85,0.07); }
+        .type-chip {
+            display: inline-block; padding: 3px 10px; border-radius: 10px;
+            font-size: 11px; font-weight: 700; text-transform: uppercase; white-space: nowrap;
+        }
+        .chip-academic  { background: rgba(91,127,214,0.15); color: #3a5fa8; }
+        .chip-admin     { background: rgba(226,112,112,0.15); color: #b04040; }
+        .chip-amenity   { background: rgba(94,189,138,0.15); color: #2e7d5a; }
+        .chip-sports    { background: rgba(228,195,90,0.15); color: #8a6a00; }
+        .chip-hostel    { background: rgba(232,136,154,0.15); color: #9a3050; }
+        .chip-pg        { background: rgba(217,119,6,0.15);  color: #92500b; }
+        .chip-food      { background: rgba(245,158,11,0.15); color: #92500b; }
+        .chip-transport { background: rgba(139,92,246,0.15); color: #5b21b6; }
+        .chip-school    { background: rgba(107,114,128,0.15);color: #374151; }
+        .row-actions { display: flex; gap: 6px; justify-content: flex-end; align-items: center; }
+        .icon-btn {
+            border: none; background: none; cursor: pointer; font-size: 16px;
+            padding: 4px 6px; border-radius: 6px; transition: background 0.15s;
+        }
+        .icon-btn:hover { background: var(--bg-light); }
+        .icon-btn.delete:hover { background: rgba(252,129,129,0.15); }
+        .save-bar {
+            position: sticky; bottom: 0; background: var(--card-light);
+            border-top: 2px solid var(--border-light); padding: 14px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; z-index: 10; border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        }
+        .dirty-count { font-size: 13px; color: #F6AD55; font-weight: 600; }
+        .save-success {
+            display: none; background: #C6F6D5; color: #276749;
+            padding: 8px 16px; border-radius: var(--radius); font-size: 13px; font-weight: 600;
+        }
+        .add-row-form {
+            background: var(--card-light); border-radius: var(--radius-lg);
+            padding: 20px 24px; box-shadow: var(--shadow); margin-bottom: 20px;
+        }
+        .add-row-form h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+        .add-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 12px; align-items: end; }
+        .add-grid .form-group { margin: 0; }
+        .add-grid input, .add-grid select {
+            padding: 9px 12px; border: 2px solid var(--border-light); border-radius: var(--radius);
+            font-size: 13px; background: var(--bg-light); color: var(--text-light); width: 100%;
+        }
+        .add-grid input:focus, .add-grid select:focus { outline: none; border-color: var(--primary); }
+        @media (max-width: 700px) { .add-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand">CampusBot Admin</a>
+        <div class="navbar-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin_panel') }}">FAQs</a>
+            <a href="{{ url_for('admin_analytics') }}">Analytics</a>
+            <a href="{{ url_for('admin_conversations') }}">Conversations</a>
+            <a href="{{ url_for('admin_security') }}">Security</a>
+            <a href="{{ url_for('admin_canteen') }}">Canteen</a>
+            <a href="{{ url_for('admin_feedback') }}">Feedback</a>
+            <a href="{{ url_for('admin_map') }}" style="color: var(--primary);">Map</a>
+            <button class="theme-toggle" onclick="toggleTheme()">&#9790;</button>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="admin-main map-editor">
+        <div class="admin-header">
+            <h2>&#128205; Campus Map Editor</h2>
+            <a href="{{ url_for('campus_map') }}" class="btn btn-secondary" target="_blank">Preview Map &#8599;</a>
+        </div>
+
+        <!-- Add new marker -->
+        <div class="add-row-form">
+            <h3>+ Add New Marker</h3>
+            <div class="add-grid">
+                <div class="form-group">
+                    <label>Building / Place Name</label>
+                    <input type="text" id="newTitle" placeholder="e.g. Boys Hostel Block C">
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="newType">
+                        <option value="academic">Academic</option>
+                        <option value="admin">Admin</option>
+                        <option value="amenity">Amenity</option>
+                        <option value="sports">Sports</option>
+                        <option value="hostel">Hostel</option>
+                        <option value="pg">PG / Hostel (nearby)</option>
+                        <option value="food">Food</option>
+                        <option value="transport">Transport</option>
+                        <option value="school">School</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Latitude</label>
+                    <input type="number" id="newLat" placeholder="18.5860" step="0.0001">
+                </div>
+                <div class="form-group">
+                    <label>Longitude</label>
+                    <input type="number" id="newLng" placeholder="74.0028" step="0.0001">
+                </div>
+            </div>
+            <div class="form-group" style="margin-top:12px;">
+                <label>Description</label>
+                <input type="text" id="newDesc" placeholder="Short description shown in the popup" style="width:100%; padding:9px 12px; border:2px solid var(--border-light); border-radius:var(--radius); font-size:13px; background:var(--bg-light); color:var(--text-light);">
+            </div>
+            <button class="btn btn-primary" style="margin-top:12px;" onclick="addMarker()">Add Marker</button>
+        </div>
+
+        <!-- Search & filter -->
+        <div class="editor-toolbar">
+            <input type="text" class="search-box" id="searchBox" placeholder="Search by name..." oninput="filterRows()">
+            <select class="type-filter" id="typeFilter" onchange="filterRows()">
+                <option value="">All Types</option>
+                <option value="academic">Academic</option>
+                <option value="admin">Admin</option>
+                <option value="amenity">Amenity</option>
+                <option value="sports">Sports</option>
+                <option value="hostel">Hostel</option>
+                <option value="pg">PG / Nearby Hostel</option>
+                <option value="food">Food</option>
+                <option value="transport">Transport</option>
+                <option value="school">School</option>
+            </select>
+            <span id="rowCount" style="font-size:13px; color:var(--text-muted);"></span>
+        </div>
+
+        <!-- Markers table -->
+        <div class="faq-table marker-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:30%">Name</th>
+                        <th style="width:40%">Description</th>
+                        <th style="width:10%">Type</th>
+                        <th style="width:14%">Coords</th>
+                        <th style="width:6%"></th>
+                    </tr>
+                </thead>
+                <tbody id="markerTableBody">
+                    <tr><td colspan="5" class="text-center">Loading markers...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sticky save bar -->
+        <div class="save-bar">
+            <div>
+                <span class="dirty-count" id="dirtyCount"></span>
+                <span id="saveSuccess" class="save-success">Saved! Map updated successfully.</span>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-secondary" onclick="discardChanges()">Discard</button>
+                <button class="btn btn-primary" onclick="saveAll()">Save All Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script>
+        let markers = [];
+        let dirty = new Set();
+
+        async function loadMarkers() {
+            const res = await fetch('/api/campus-markers');
+            markers = await res.json();
+            renderTable(markers);
+        }
+
+        function typeChip(type) {
+            return `<span class="type-chip chip-${type}">${type}</span>`;
+        }
+
+        function renderTable(list) {
+            const tbody = document.getElementById('markerTableBody');
+            if (!list.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">No markers found.</td></tr>';
+                document.getElementById('rowCount').textContent = '0 markers';
+                return;
+            }
+            document.getElementById('rowCount').textContent = `${list.length} marker${list.length !== 1 ? 's' : ''}`;
+            tbody.innerHTML = list.map(m => `
+                <tr data-id="${m.id}" data-type="${m.type}">
+                    <td class="editable-cell">
+                        <textarea class="editable-title" rows="1" data-field="title" data-id="${m.id}"
+                            oninput="markDirty(${m.id}, this)">${escHtml(m.title)}</textarea>
+                    </td>
+                    <td class="editable-cell">
+                        <textarea class="editable-desc" data-field="desc" data-id="${m.id}"
+                            oninput="markDirty(${m.id}, this)">${escHtml(m.desc)}</textarea>
+                    </td>
+                    <td>${typeChip(m.type)}</td>
+                    <td style="font-size:11px; color:var(--text-muted); line-height:1.8;">
+                        ${m.coords[0].toFixed(5)}<br>${m.coords[1].toFixed(5)}
+                    </td>
+                    <td>
+                        <div class="row-actions">
+                            <button class="icon-btn delete" title="Delete marker" onclick="deleteMarker(${m.id})">&#128465;</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function markDirty(id, el) {
+            el.classList.add('dirty');
+            dirty.add(id);
+            // Update in-memory
+            const m = markers.find(x => x.id === id);
+            if (m) m[el.dataset.field] = el.value;
+            updateDirtyCount();
+        }
+
+        function updateDirtyCount() {
+            const count = dirty.size;
+            document.getElementById('dirtyCount').textContent =
+                count > 0 ? `${count} unsaved change${count !== 1 ? 's' : ''}` : '';
+        }
+
+        function filterRows() {
+            const q = document.getElementById('searchBox').value.toLowerCase();
+            const t = document.getElementById('typeFilter').value;
+            const filtered = markers.filter(m =>
+                (!q || m.title.toLowerCase().includes(q) || m.desc.toLowerCase().includes(q)) &&
+                (!t || m.type === t)
+            );
+            renderTable(filtered);
+        }
+
+        async function saveAll() {
+            const btn = document.querySelector('.save-bar .btn-primary');
+            btn.textContent = 'Saving...';
+            btn.disabled = true;
+            try {
+                const res = await fetch('/api/admin/campus-markers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(markers)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    dirty.clear();
+                    document.querySelectorAll('.dirty').forEach(el => el.classList.remove('dirty'));
+                    updateDirtyCount();
+                    const banner = document.getElementById('saveSuccess');
+                    banner.style.display = 'inline-block';
+                    setTimeout(() => { banner.style.display = 'none'; }, 3500);
+                } else {
+                    alert(data.error || 'Save failed.');
+                }
+            } catch (e) {
+                alert('Network error. Please try again.');
+            }
+            btn.textContent = 'Save All Changes';
+            btn.disabled = false;
+        }
+
+        function discardChanges() {
+            if (dirty.size === 0) return;
+            if (!confirm('Discard all unsaved changes?')) return;
+            dirty.clear();
+            loadMarkers();
+            updateDirtyCount();
+        }
+
+        function deleteMarker(id) {
+            const m = markers.find(x => x.id === id);
+            if (!confirm(`Delete "${m ? m.title : id}"? This cannot be undone without saving.`)) return;
+            markers = markers.filter(x => x.id !== id);
+            dirty.add('__deleted__');
+            updateDirtyCount();
+            filterRows();
+        }
+
+        function addMarker() {
+            const title = document.getElementById('newTitle').value.trim();
+            const type  = document.getElementById('newType').value;
+            const lat   = parseFloat(document.getElementById('newLat').value);
+            const lng   = parseFloat(document.getElementById('newLng').value);
+            const desc  = document.getElementById('newDesc').value.trim();
+
+            if (!title) { alert('Name is required.'); return; }
+            if (isNaN(lat) || isNaN(lng)) { alert('Valid latitude and longitude are required.'); return; }
+
+            const newId = Math.max(0, ...markers.map(m => m.id)) + 1;
+            markers.push({ id: newId, coords: [lat, lng], type, title, desc });
+            dirty.add(newId);
+            updateDirtyCount();
+
+            document.getElementById('newTitle').value = '';
+            document.getElementById('newLat').value = '';
+            document.getElementById('newLng').value = '';
+            document.getElementById('newDesc').value = '';
+            filterRows();
+        }
+
+        function escHtml(s) {
+            return String(s)
+                .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        loadMarkers();
+    </script>
+</body>
+</html>

@@ -16,6 +16,9 @@
             <a href="{{ url_for('admin_analytics') }}">Analytics</a>
             <a href="{{ url_for('admin_conversations') }}">Conversations</a>
             <a href="{{ url_for('admin_security') }}">Security</a>
+            <a href="{{ url_for('admin_canteen') }}">Canteen</a>
+            <a href="{{ url_for('admin_feedback') }}">Feedback</a>
+            <a href="{{ url_for('admin_map') }}">Map</a>
             <button class="theme-toggle" onclick="toggleTheme()">&#9790;</button>
             <a href="{{ url_for('logout') }}">Logout</a>
         </div>
@@ -23,6 +26,49 @@
 
     <div class="admin-main">
         <div class="admin-header">
+            <h2>Admin Panel</h2>
+        </div>
+
+        <!-- Admin Tools Grid -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin-bottom:36px;">
+            <a href="{{ url_for('admin_panel') }}" class="admin-tool-card" style="border-top-color:#5B7FD6;">
+                <div class="tool-icon">&#128196;</div>
+                <div class="tool-label">FAQ Management</div>
+                <div class="tool-sub">Add, edit & delete FAQs</div>
+            </a>
+            <a href="{{ url_for('admin_analytics') }}" class="admin-tool-card" style="border-top-color:#48BB78;">
+                <div class="tool-icon">&#128200;</div>
+                <div class="tool-label">Analytics</div>
+                <div class="tool-sub">Usage stats & charts</div>
+            </a>
+            <a href="{{ url_for('admin_conversations') }}" class="admin-tool-card" style="border-top-color:#F6AD55;">
+                <div class="tool-icon">&#128172;</div>
+                <div class="tool-label">Conversations</div>
+                <div class="tool-sub">View chat history</div>
+            </a>
+            <a href="{{ url_for('admin_security') }}" class="admin-tool-card" style="border-top-color:#FC8181;">
+                <div class="tool-icon">&#128274;</div>
+                <div class="tool-label">Security Logs</div>
+                <div class="tool-sub">Login events & alerts</div>
+            </a>
+            <a href="{{ url_for('admin_canteen') }}" class="admin-tool-card" style="border-top-color:#F59E0B;">
+                <div class="tool-icon">&#127869;</div>
+                <div class="tool-label">Canteen Menu</div>
+                <div class="tool-sub">Manage daily menu</div>
+            </a>
+            <a href="{{ url_for('admin_feedback') }}" class="admin-tool-card" style="border-top-color:#B794F4;">
+                <div class="tool-icon">&#128203;</div>
+                <div class="tool-label">Faculty Feedback</div>
+                <div class="tool-sub">View student ratings</div>
+            </a>
+            <a href="{{ url_for('admin_map') }}" class="admin-tool-card" style="border-top-color:#68D391;">
+                <div class="tool-icon">&#128205;</div>
+                <div class="tool-label">Map Editor</div>
+                <div class="tool-sub">Edit campus building names</div>
+            </a>
+        </div>
+
+        <div class="admin-header" style="margin-top:0;">
             <h2>FAQ Management</h2>
             <div style="display: flex; gap: 12px;">
                 <button class="btn btn-primary" onclick="openAddModal()">+ Add FAQ</button>

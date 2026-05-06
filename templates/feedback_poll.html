@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Feedback — JSPM Wagholi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .fb-page { max-width: 720px; margin: 48px auto; padding: 0 24px; }
+        .fb-header { text-align: center; margin-bottom: 40px; }
+        .fb-header h2 {
+            font-size: 30px; font-weight: 800;
+            background: linear-gradient(135deg, #6C63FF, #FF6B9D);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .fb-header p { color: var(--text-muted); font-size: 15px; margin-top: 8px; }
+        .anon-note {
+            display: flex; align-items: center; gap: 10px; background: rgba(108,99,255,0.07);
+            border-left: 4px solid var(--primary); border-radius: var(--radius);
+            padding: 12px 16px; margin-bottom: 28px; font-size: 13px; color: var(--text-muted);
+        }
+        .anon-note strong { color: var(--primary); }
+        .fb-form {
+            background: var(--card-light); border-radius: var(--radius-lg);
+            padding: 36px; box-shadow: var(--shadow);
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .star-rating { display: flex; gap: 8px; flex-direction: row-reverse; justify-content: flex-end; }
+        .star-rating input { display: none; }
+        .star-rating label {
+            font-size: 32px; cursor: pointer; color: var(--border-light); transition: color 0.15s;
+        }
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label { color: #F6AD55; }
+        .star-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+        .star-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 4px; max-width: 200px; }
+        .fb-submit { width: 100%; margin-top: 8px; }
+        .success-card {
+            display: none; text-align: center; padding: 48px 24px;
+            background: var(--card-light); border-radius: var(--radius-lg); box-shadow: var(--shadow);
+        }
+        .success-card .success-icon { font-size: 64px; margin-bottom: 16px; }
+        .success-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        .success-card p { color: var(--text-muted); }
+        .success-card .btn { margin-top: 20px; }
+        textarea.fb-textarea {
+            width: 100%; padding: 12px 14px; border: 2px solid var(--border-light);
+            border-radius: var(--radius); font-size: 14px; resize: vertical; min-height: 100px;
+            font-family: inherit; background: var(--bg-light); color: var(--text-light);
+        }
+        textarea.fb-textarea:focus { outline: none; border-color: var(--primary); }
+        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } .fb-form { padding: 24px; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand">JSPM Wagholi</a>
+        <div class="navbar-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('campus_map') }}">Campus Map</a>
+            <a href="{{ url_for('lost_found') }}">Lost &amp; Found</a>
+            <a href="{{ url_for('feedback_poll') }}" style="color: var(--primary);">Feedback</a>
+            <a href="{{ url_for('profile') }}">My Profile</a>
+            <a href="{{ url_for('contact_page') }}">Contact</a>
+            {% if session.get('role') == 'admin' %}
+            <a href="{{ url_for('admin_panel') }}">Admin</a>
+            {% endif %}
+            <button class="theme-toggle" onclick="toggleTheme()">&#9790;</button>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="fb-page">
+        <div class="fb-header">
+            <h2>&#128203; Faculty Feedback Poll</h2>
+            <p>Help us improve teaching quality. Your feedback is completely anonymous.</p>
+        </div>
+
+        <!-- Anonymity notice -->
+        <div class="anon-note">
+            <span style="font-size:18px;">&#128274;</span>
+            <span><strong>100% Anonymous</strong> &mdash; Your identity is never stored. Only subject, faculty name, rating and comment are recorded.</span>
+        </div>
+
+        <!-- Feedback form -->
+        <div class="fb-form" id="fbFormContainer">
+            <form id="fbForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fbSubject">Subject <span style="color:#FC8181">*</span></label>
+                        <input type="text" id="fbSubject" placeholder="e.g. Data Structures, DBMS, Maths-III" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fbFaculty">Faculty Name <span style="color:#FC8181">*</span></label>
+                        <input type="text" id="fbFaculty" placeholder="e.g. Prof. Sharma" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Rating <span style="color:#FC8181">*</span></label>
+                    <div class="star-rating" id="starRating">
+                        <input type="radio" name="rating" id="s5" value="5"><label for="s5" title="Excellent">&#9733;</label>
+                        <input type="radio" name="rating" id="s4" value="4"><label for="s4" title="Good">&#9733;</label>
+                        <input type="radio" name="rating" id="s3" value="3"><label for="s3" title="Average">&#9733;</label>
+                        <input type="radio" name="rating" id="s2" value="2"><label for="s2" title="Below Average">&#9733;</label>
+                        <input type="radio" name="rating" id="s1" value="1"><label for="s1" title="Poor">&#9733;</label>
+                    </div>
+                    <div class="star-labels">
+                        <span>Poor</span>
+                        <span>Excellent</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="fbComment">Comments (optional)</label>
+                    <textarea class="fb-textarea" id="fbComment" placeholder="Share specific feedback — teaching style, clarity, helpfulness, punctuality..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary fb-submit">Submit Feedback &#10148;</button>
+            </form>
+        </div>
+
+        <!-- Success state -->
+        <div class="success-card" id="successCard">
+            <div class="success-icon">&#128515;</div>
+            <h3>Thank you for your feedback!</h3>
+            <p>Your response has been recorded anonymously and will help improve teaching quality at JSPM Wagholi.</p>
+            <button class="btn btn-primary" onclick="resetForm()">Submit Another Response</button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary" style="margin-left: 12px;">Back to Dashboard</a>
+        </div>
+    </div>
+
+    {% include 'footer_wagholi.html' %}
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/session_timeout.js') }}"></script>
+    <script>
+        document.getElementById('fbForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const subject = document.getElementById('fbSubject').value.trim();
+            const faculty = document.getElementById('fbFaculty').value.trim();
+            const ratingInput = document.querySelector('input[name="rating"]:checked');
+            const comment = document.getElementById('fbComment').value.trim();
+
+            if (!subject || !faculty) {
+                alert('Subject and faculty name are required.');
+                return;
+            }
+            if (!ratingInput) {
+                alert('Please select a rating.');
+                return;
+            }
+
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.textContent = 'Submitting...';
+            submitBtn.disabled = true;
+
+            try {
+                const res = await fetch('/api/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        subject,
+                        faculty_name: faculty,
+                        rating: parseInt(ratingInput.value),
+                        comment
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('fbFormContainer').style.display = 'none';
+                    document.getElementById('successCard').style.display = 'block';
+                } else {
+                    alert(data.error || 'Submission failed. Please try again.');
+                    submitBtn.textContent = 'Submit Feedback →';
+                    submitBtn.disabled = false;
+                }
+            } catch (err) {
+                alert('Network error. Please try again.');
+                submitBtn.textContent = 'Submit Feedback →';
+                submitBtn.disabled = false;
+            }
+        });
+
+        function resetForm() {
+            document.getElementById('fbForm').reset();
+            document.getElementById('successCard').style.display = 'none';
+            document.getElementById('fbFormContainer').style.display = 'block';
+            document.querySelector('.fb-form button[type="submit"]').textContent = 'Submit Feedback →';
+            document.querySelector('.fb-form button[type="submit"]').disabled = false;
+        }
+    </script>
+</body>
+</html>

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard — JSPM Wagholi | CampusConnect AI & MindMate AI</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Intro.js CDN (Feature 13) -->
+    <link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
 </head>
 <body>
     <!-- Navbar -->
@@ -12,11 +14,14 @@
         <a href="{{ url_for('dashboard') }}" class="navbar-brand">JSPM Wagholi</a>
         <div class="navbar-links">
             <a href="{{ url_for('campus_map') }}">Campus Map</a>
+            <a href="{{ url_for('lost_found') }}" id="tour-lost-found">Lost &amp; Found</a>
+            <a href="{{ url_for('feedback_poll') }}">Feedback</a>
+            <a href="{{ url_for('profile') }}">My Profile</a>
             <a href="{{ url_for('contact_page') }}">Contact</a>
             {% if session.get('role') == 'admin' %}
             <a href="{{ url_for('admin_panel') }}">Admin</a>
             {% endif %}
-            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">&#9790;</button>
+            <button class="theme-toggle" id="tour-darkmode" onclick="toggleTheme()" title="Toggle dark mode">&#9790;</button>
             <a href="{{ url_for('logout') }}">Logout</a>
         </div>
     </nav>
@@ -28,17 +33,42 @@
             <p>JSPM University — Wagholi Campus | Choose a chatbot to get started</p>
         </div>
 
+        <!-- Widgets Row (Countdown + Canteen) -->
+        <div class="dashboard-widgets">
+            <!-- Feature 1: Exam Countdown Widget -->
+            <div class="exam-countdown-widget" id="examCountdownWidget">
+                <h4>&#128197; Next SPPU Exam</h4>
+                <div class="exam-name" id="examName">Loading...</div>
+                <div class="countdown-timer" id="countdownTimer">
+                    <div class="countdown-unit"><span class="num" id="cdDays">--</span><span class="label">Days</span></div>
+                    <div class="countdown-unit"><span class="num" id="cdHours">--</span><span class="label">Hours</span></div>
+                    <div class="countdown-unit"><span class="num" id="cdMins">--</span><span class="label">Mins</span></div>
+                    <div class="countdown-unit"><span class="num" id="cdSecs">--</span><span class="label">Secs</span></div>
+                </div>
+                <p class="exam-note" id="examNote"></p>
+            </div>
+
+            <!-- Feature 3: Canteen Menu of the Day -->
+            <div class="canteen-widget" id="canteenWidget">
+                <h4>&#127869; Today's Canteen Menu</h4>
+                <div id="canteenContent"><p class="canteen-empty">Loading menu...</p></div>
+            </div>
+        </div>
+
+        <!-- Bot Cards -->
         <div class="bot-cards">
-            <!-- Campus Chatbot Card — Goes to language selection first -->
-            <div class="bot-card campus" onclick="window.location.href='{{ url_for('select_language', bot='campus') }}'">
+            <!-- Campus Chatbot Card -->
+            <div class="bot-card campus" id="tour-campus-bot"
+                 onclick="window.location.href='{{ url_for('select_language', bot='campus') }}'">
                 <div class="bot-card-icon">&#127979;</div>
                 <h3>CampusConnect AI</h3>
-                <p>Ask about admissions, courses, fees, hostel, placements, library, exams, and facilities at JSPM Wagholi Campus. Supports English, Hindi & Marathi.</p>
+                <p>Ask about admissions, courses, fees, hostel, placements, library, exams, and facilities at JSPM Wagholi Campus. Supports English, Hindi &amp; Marathi.</p>
                 <button class="btn">Start Chatting &#8594;</button>
             </div>
 
-            <!-- MindMate AI Card — Goes directly to chat (English only) -->
-            <div class="bot-card mindmate" onclick="window.location.href='{{ url_for('mindmate_chat') }}'">
+            <!-- MindMate AI Card -->
+            <div class="bot-card mindmate" id="tour-mindmate-bot"
+                 onclick="window.location.href='{{ url_for('mindmate_chat') }}'">
                 <div class="bot-card-icon">&#128155;</div>
                 <h3>MindMate AI</h3>
                 <p>Your friendly emotional support companion. Talk about stress, anxiety, loneliness, academic pressure, or just chat. I'm here to listen, pookie! &#128155;</p>
@@ -51,5 +81,137 @@
     {% include 'footer_wagholi.html' %}
 
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/session_timeout.js') }}"></script>
+    <script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
+
+    <!-- Feature 1: Exam Countdown -->
+    <script>
+    (async function initExamCountdown() {
+        const EXAM_DATES_URL = "{{ url_for('static', filename='..') }}".replace('/static/..', '') + '/database/exam_dates.json';
+
+        // Fetch from a route instead — we expose it inline via Jinja
+        const exams = {{ exam_dates | tojson }};
+
+        const now = new Date();
+        const upcoming = exams
+            .map(e => ({ ...e, ts: new Date(e.date + 'T00:00:00') }))
+            .filter(e => e.ts > now)
+            .sort((a, b) => a.ts - b.ts);
+
+        if (!upcoming.length) {
+            document.getElementById('examName').textContent = 'No upcoming exams scheduled.';
+            document.getElementById('countdownTimer').style.display = 'none';
+            return;
+        }
+
+        const next = upcoming[0];
+        document.getElementById('examName').textContent = next.name;
+        document.getElementById('examNote').textContent = next.note || '';
+
+        function tick() {
+            const diff = next.ts - new Date();
+            if (diff <= 0) {
+                document.getElementById('examName').textContent = next.name + ' — Exam Day!';
+                document.getElementById('countdownTimer').style.display = 'none';
+                return;
+            }
+            const d = Math.floor(diff / 86400000);
+            const h = Math.floor((diff % 86400000) / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            document.getElementById('cdDays').textContent  = String(d).padStart(2, '0');
+            document.getElementById('cdHours').textContent = String(h).padStart(2, '0');
+            document.getElementById('cdMins').textContent  = String(m).padStart(2, '0');
+            document.getElementById('cdSecs').textContent  = String(s).padStart(2, '0');
+        }
+        tick();
+        setInterval(tick, 1000);
+    })();
+    </script>
+
+    <!-- Feature 3: Canteen Widget -->
+    <script>
+    (async function loadCanteen() {
+        const catIcons = { breakfast: '🌅', lunch: '🍛', snacks: '🍿', dinner: '🌙' };
+        try {
+            const res = await fetch('/api/canteen/today');
+            const data = await res.json();
+            const menu = data.menu || {};
+            const el = document.getElementById('canteenContent');
+            const cats = Object.keys(menu);
+            if (!cats.length) {
+                el.innerHTML = '<p class="canteen-empty">No menu posted for today. Check back later!</p>';
+                return;
+            }
+            el.innerHTML = `<div class="canteen-categories">` +
+                cats.map(cat => `
+                    <div class="canteen-category">
+                        <div class="cat-title">${catIcons[cat] || '🍽️'} ${cat.charAt(0).toUpperCase()+cat.slice(1)}</div>
+                        ${menu[cat].map(item => `
+                            <div class="canteen-item">
+                                <span>${item.item}</span>
+                                ${item.price ? `<span class="item-price">₹${item.price}</span>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `).join('') + `</div>`;
+        } catch(e) {
+            document.getElementById('canteenContent').innerHTML =
+                '<p class="canteen-empty">Menu unavailable. Please try again.</p>';
+        }
+    })();
+    </script>
+
+    <!-- Feature 13: Intro.js Onboarding Tour -->
+    <script>
+    (function initTour() {
+        if (localStorage.getItem('jspm_tour_done')) return;
+
+        setTimeout(function() {
+            introJs().setOptions({
+                steps: [
+                    {
+                        title: '👋 Welcome to JSPM Wagholi!',
+                        intro: 'Let us quickly show you around. This tour takes less than a minute.'
+                    },
+                    {
+                        element: document.getElementById('tour-campus-bot'),
+                        title: '🏫 CampusConnect AI',
+                        intro: 'Ask anything about JSPM Wagholi — admissions, fees, hostel, placements, library, and more. Supports English, Hindi & Marathi!'
+                    },
+                    {
+                        element: document.getElementById('tour-mindmate-bot'),
+                        title: '💛 MindMate AI',
+                        intro: 'Feeling stressed or anxious? MindMate is your safe space — talk about anything without judgment. It also detects mood and tracks your wellbeing over time.'
+                    },
+                    {
+                        element: document.getElementById('tour-lost-found'),
+                        title: '🔍 Lost & Found Board',
+                        intro: 'Lost something on campus? Found an item? Post it here to help connect students!'
+                    },
+                    {
+                        element: document.getElementById('tour-darkmode'),
+                        title: '🌙 Dark Mode',
+                        intro: 'Toggle between light and dark mode anytime. Your preference is saved automatically.'
+                    },
+                    {
+                        title: "You're all set!",
+                        intro: "Explore the campus AI tools and stay on top of your SPPU exams with the countdown widget. Have a great semester! 🎓"
+                    }
+                ],
+                showProgress: true,
+                showBullets: false,
+                nextLabel: 'Next →',
+                prevLabel: '← Back',
+                doneLabel: 'Get Started!',
+                exitOnOverlayClick: false
+            }).oncomplete(function() {
+                localStorage.setItem('jspm_tour_done', '1');
+            }).onexit(function() {
+                localStorage.setItem('jspm_tour_done', '1');
+            }).start();
+        }, 800);
+    })();
+    </script>
 </body>
 </html>

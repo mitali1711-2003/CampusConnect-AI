@@ -8,7 +8,7 @@ and mental health support (MindMate AI).
 import os
 import json
 from functools import wraps
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import (
     Flask, render_template, request, jsonify,
@@ -21,7 +21,7 @@ from models.database import get_db, init_db, load_dataset_to_db
 from utils.auth import hash_password, check_password
 from utils.nlp_engine import (
     detect_language, get_campus_response, get_mindmate_response,
-    get_suggested_questions, reload_faqs
+    get_suggested_questions, reload_faqs, search_faq_questions
 )
 
 app = Flask(__name__)
@@ -35,6 +35,19 @@ if not SECRET_KEY:
 app.secret_key = SECRET_KEY
 
 limiter = Limiter(get_remote_address, app=app, default_limits=[])
+
+# Session expires after 35 min server-side (JS warns at 30 min)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=35)
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+
+
+@app.errorhandler(429)
+def ratelimit_exceeded(e):
+    return jsonify({
+        'error': 'Too many messages! You have reached the limit of 30 messages per minute. Please wait a moment and try again.',
+        'retry_after': 60
+    }), 429
 
 # ─── Initialization ───────────────────────────────────────────────
 
@@ -106,6 +119,7 @@ def login():
             conn.commit()
             conn.close()
 
+            session.permanent = True
             session['user_id'] = user['id']
             session['username'] = user['username']
             session['role'] = user['role']
@@ -179,7 +193,16 @@ def logout():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html', username=session.get('username'))
+    exam_path = os.path.join(os.path.dirname(__file__), 'database', 'exam_dates.json')
+    try:
+        with open(exam_path, 'r', encoding='utf-8') as f:
+            exam_data = json.load(f)
+        exam_dates = exam_data.get('exams', [])
+    except Exception:
+        exam_dates = []
+    return render_template('dashboard.html',
+                           username=session.get('username'),
+                           exam_dates=exam_dates)
 
 
 # ─── Language Selection (NEW) ─────────────────────────────────────
@@ -230,6 +253,39 @@ def mindmate_chat():
 @login_required
 def campus_map():
     return render_template('campus_map.html')
+
+
+MARKERS_FILE = os.path.join(os.path.dirname(__file__), 'database', 'campus_markers.json')
+
+
+@app.route('/api/campus-markers', methods=['GET'])
+@login_required
+def api_campus_markers():
+    try:
+        with open(MARKERS_FILE, 'r', encoding='utf-8') as f:
+            return jsonify(json.load(f))
+    except Exception:
+        return jsonify([]), 200
+
+
+@app.route('/api/admin/campus-markers', methods=['POST'])
+@admin_required
+def api_admin_save_markers():
+    markers = request.get_json()
+    if not isinstance(markers, list):
+        return jsonify({'error': 'Expected a JSON array'}), 400
+    try:
+        with open(MARKERS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(markers, f, ensure_ascii=False, indent=2)
+        return jsonify({'success': True, 'count': len(markers)})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/admin/map')
+@admin_required
+def admin_map():
+    return render_template('admin_map.html')
 
 
 # ─── Contact Page (NEW) ──────────────────────────────────────────
@@ -309,7 +365,8 @@ def api_campus_chat():
         'response': result['answer'],
         'language': lang,
         'confidence': round(result['confidence'], 3),
-        'category': result['category']
+        'category': result['category'],
+        'did_you_mean': result.get('did_you_mean')
     })
 
 
@@ -339,6 +396,11 @@ def api_mindmate_chat():
                VALUES (?, ?, ?, ?, ?)''',
             (message, 'mindmate', lang, 1.0, session['user_id'])
         )
+        # Log mood category for the profile mood tracker
+        conn.execute(
+            'INSERT INTO mood_logs (user_id, category) VALUES (?, ?)',
+            (session['user_id'], result['category'])
+        )
         conn.commit()
     except Exception as e:
         print(f"[WARN] DB write error (mindmate): {e}")
@@ -355,9 +417,13 @@ def api_mindmate_chat():
 @app.route('/api/suggestions', methods=['GET'])
 @login_required
 def api_suggestions():
-    """Get suggested FAQ questions in session language."""
+    """Get suggested FAQ questions. Accepts optional ?q= for live search."""
     lang = request.args.get('language', session.get('language', 'en'))
-    questions = get_suggested_questions(language=lang, limit=5)
+    query = request.args.get('q', '').strip()
+    if query:
+        questions = search_faq_questions(query=query, language=lang, limit=6)
+    else:
+        questions = get_suggested_questions(language=lang, limit=5)
     return jsonify({'suggestions': questions})
 
 
@@ -719,6 +785,266 @@ def api_upload_dataset():
     if success:
         reload_faqs()
     return jsonify({'success': success, 'message': 'Dataset uploaded and loaded'})
+
+
+# ─── Lost & Found ────────────────────────────────────────────────
+
+@app.route('/lost-found')
+@login_required
+def lost_found():
+    conn = get_db()
+    items = conn.execute(
+        '''SELECT lf.*, u.username FROM lost_found lf
+           JOIN users u ON lf.user_id = u.id
+           WHERE lf.is_resolved = 0
+           ORDER BY lf.created_at DESC LIMIT 100'''
+    ).fetchall()
+    conn.close()
+    return render_template('lost_found.html',
+                           items=[dict(i) for i in items],
+                           username=session.get('username'))
+
+
+@app.route('/api/lost-found', methods=['POST'])
+@login_required
+def api_post_lost_found():
+    data = request.get_json()
+    post_type = data.get('post_type', '').strip()
+    item_name = data.get('item_name', '').strip()
+    description = data.get('description', '').strip()
+    location = data.get('location', '').strip()
+    contact_info = data.get('contact_info', '').strip()
+
+    if post_type not in ('lost', 'found'):
+        return jsonify({'error': 'post_type must be "lost" or "found"'}), 400
+    if not item_name or not contact_info:
+        return jsonify({'error': 'Item name and contact info are required.'}), 400
+
+    conn = get_db()
+    conn.execute(
+        '''INSERT INTO lost_found (user_id, post_type, item_name, description, location, contact_info)
+           VALUES (?, ?, ?, ?, ?, ?)''',
+        (session['user_id'], post_type, item_name, description, location, contact_info)
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True, 'message': 'Post submitted successfully!'})
+
+
+@app.route('/api/lost-found/<int:item_id>/resolve', methods=['POST'])
+@login_required
+def api_resolve_lost_found(item_id):
+    conn = get_db()
+    item = conn.execute('SELECT user_id FROM lost_found WHERE id = ?', (item_id,)).fetchone()
+    if not item:
+        conn.close()
+        return jsonify({'error': 'Item not found'}), 404
+    # Only owner or admin can resolve
+    if item['user_id'] != session['user_id'] and session.get('role') != 'admin':
+        conn.close()
+        return jsonify({'error': 'Unauthorized'}), 403
+    conn.execute('UPDATE lost_found SET is_resolved = 1 WHERE id = ?', (item_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+
+# ─── Canteen Menu ─────────────────────────────────────────────────
+
+@app.route('/api/canteen/today', methods=['GET'])
+@login_required
+def api_canteen_today():
+    today = datetime.now().strftime('%Y-%m-%d')
+    conn = get_db()
+    items = conn.execute(
+        '''SELECT category, item_name, price, is_available
+           FROM canteen_menu WHERE menu_date = ? ORDER BY category, id''',
+        (today,)
+    ).fetchall()
+    conn.close()
+    menu = {}
+    for item in items:
+        cat = item['category']
+        if cat not in menu:
+            menu[cat] = []
+        menu[cat].append({'item': item['item_name'], 'price': item['price'],
+                          'available': bool(item['is_available'])})
+    return jsonify({'date': today, 'menu': menu})
+
+
+@app.route('/admin/canteen')
+@admin_required
+def admin_canteen():
+    return render_template('admin_canteen.html')
+
+
+@app.route('/api/admin/canteen', methods=['GET'])
+@admin_required
+def api_admin_canteen_get():
+    date_str = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
+    conn = get_db()
+    items = conn.execute(
+        'SELECT * FROM canteen_menu WHERE menu_date = ? ORDER BY category, id',
+        (date_str,)
+    ).fetchall()
+    conn.close()
+    return jsonify({'items': [dict(i) for i in items], 'date': date_str})
+
+
+@app.route('/api/admin/canteen', methods=['POST'])
+@admin_required
+def api_admin_canteen_post():
+    data = request.get_json()
+    menu_date = data.get('menu_date', datetime.now().strftime('%Y-%m-%d'))
+    category = data.get('category', '').strip()
+    item_name = data.get('item_name', '').strip()
+    price = data.get('price', '').strip()
+
+    if category not in ('breakfast', 'lunch', 'snacks', 'dinner'):
+        return jsonify({'error': 'Invalid category'}), 400
+    if not item_name:
+        return jsonify({'error': 'Item name is required'}), 400
+
+    conn = get_db()
+    conn.execute(
+        '''INSERT INTO canteen_menu (menu_date, category, item_name, price, updated_by)
+           VALUES (?, ?, ?, ?, ?)''',
+        (menu_date, category, item_name, price, session.get('username', 'admin'))
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True, 'message': 'Menu item added.'})
+
+
+@app.route('/api/admin/canteen/<int:item_id>', methods=['DELETE'])
+@admin_required
+def api_admin_canteen_delete(item_id):
+    conn = get_db()
+    conn.execute('DELETE FROM canteen_menu WHERE id = ?', (item_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+
+# ─── Anonymous Faculty Feedback Poll ─────────────────────────────
+
+@app.route('/feedback')
+@login_required
+def feedback_poll():
+    return render_template('feedback_poll.html', username=session.get('username'))
+
+
+@app.route('/api/feedback', methods=['POST'])
+@login_required
+def api_submit_feedback():
+    data = request.get_json()
+    subject = data.get('subject', '').strip()
+    faculty_name = data.get('faculty_name', '').strip()
+    rating = data.get('rating')
+    comment = data.get('comment', '').strip()
+
+    if not subject or not faculty_name:
+        return jsonify({'error': 'Subject and faculty name are required.'}), 400
+    if not isinstance(rating, int) or rating < 1 or rating > 5:
+        return jsonify({'error': 'Rating must be 1–5.'}), 400
+
+    conn = get_db()
+    conn.execute(
+        '''INSERT INTO faculty_feedback (subject, faculty_name, rating, comment)
+           VALUES (?, ?, ?, ?)''',
+        (subject, faculty_name, rating, comment)
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True, 'message': 'Thank you! Your feedback was submitted anonymously.'})
+
+
+@app.route('/admin/feedback')
+@admin_required
+def admin_feedback():
+    return render_template('admin_feedback.html')
+
+
+@app.route('/api/admin/feedback', methods=['GET'])
+@admin_required
+def api_admin_feedback():
+    conn = get_db()
+    aggregated = conn.execute('''
+        SELECT subject, faculty_name,
+               ROUND(AVG(rating), 2) as avg_rating,
+               COUNT(*) as total_responses,
+               MIN(rating) as min_rating,
+               MAX(rating) as max_rating
+        FROM faculty_feedback
+        GROUP BY subject, faculty_name
+        ORDER BY subject, avg_rating DESC
+    ''').fetchall()
+
+    recent = conn.execute('''
+        SELECT subject, faculty_name, rating, comment, created_at
+        FROM faculty_feedback
+        ORDER BY created_at DESC LIMIT 50
+    ''').fetchall()
+
+    conn.close()
+    return jsonify({
+        'aggregated': [dict(r) for r in aggregated],
+        'recent': [dict(r) for r in recent]
+    })
+
+
+# ─── Profile + Mood Tracker ───────────────────────────────────────
+
+@app.route('/profile')
+@login_required
+def profile():
+    conn = get_db()
+    user = conn.execute(
+        'SELECT username, email, created_at FROM users WHERE id = ?',
+        (session['user_id'],)
+    ).fetchone()
+    campus_count = conn.execute(
+        'SELECT COUNT(*) as c FROM chat_history WHERE user_id = ? AND bot_type = "campus"',
+        (session['user_id'],)
+    ).fetchone()
+    mindmate_count = conn.execute(
+        'SELECT COUNT(*) as c FROM chat_history WHERE user_id = ? AND bot_type = "mindmate"',
+        (session['user_id'],)
+    ).fetchone()
+    conn.close()
+    return render_template('profile.html',
+                           user=dict(user),
+                           campus_count=campus_count['c'],
+                           mindmate_count=mindmate_count['c'])
+
+
+@app.route('/api/mood-data')
+@login_required
+def api_mood_data():
+    conn = get_db()
+    # Daily mood counts for the last 7 days grouped by category
+    rows = conn.execute('''
+        SELECT category, DATE(created_at) as date, COUNT(*) as count
+        FROM mood_logs
+        WHERE user_id = ? AND created_at >= DATE('now', '-7 days')
+        GROUP BY category, DATE(created_at)
+        ORDER BY date, category
+    ''', (session['user_id'],)).fetchall()
+
+    # Overall distribution
+    dist = conn.execute('''
+        SELECT category, COUNT(*) as count
+        FROM mood_logs
+        WHERE user_id = ?
+        GROUP BY category
+        ORDER BY count DESC
+    ''', (session['user_id'],)).fetchall()
+
+    conn.close()
+    return jsonify({
+        'weekly': [dict(r) for r in rows],
+        'distribution': [dict(r) for r in dist]
+    })
 
 
 # ─── Initialization (runs for both gunicorn and dev server) ──────

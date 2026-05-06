@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile — JSPM Wagholi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        .profile-page { max-width: 1000px; margin: 40px auto; padding: 0 24px; }
+        .profile-hero {
+            background: linear-gradient(135deg, #6C63FF 0%, #FF6B9D 100%);
+            border-radius: var(--radius-lg); padding: 36px 40px; margin-bottom: 32px;
+            color: #fff; display: flex; align-items: center; gap: 28px;
+        }
+        .profile-avatar {
+            width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.25);
+            display: flex; align-items: center; justify-content: center; font-size: 36px; flex-shrink: 0;
+            border: 3px solid rgba(255,255,255,0.5);
+        }
+        .profile-hero-info h2 { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+        .profile-hero-info p { font-size: 14px; opacity: 0.85; margin-bottom: 2px; }
+        .profile-hero-info .join-date { font-size: 12px; opacity: 0.7; }
+        .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
+        .profile-grid-full { grid-template-columns: 1fr; }
+        .stat-card {
+            background: var(--card-light); border-radius: var(--radius-lg); padding: 24px;
+            box-shadow: var(--shadow); text-align: center;
+        }
+        .stat-card .stat-icon { font-size: 32px; margin-bottom: 10px; }
+        .stat-card h4 { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card .stat-value { font-size: 36px; font-weight: 800; color: var(--primary); margin: 4px 0; }
+        .stat-card p { font-size: 12px; color: var(--text-muted); }
+        .chart-card {
+            background: var(--card-light); border-radius: var(--radius-lg); padding: 24px 28px;
+            box-shadow: var(--shadow); margin-bottom: 24px;
+        }
+        .chart-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 20px; }
+        .charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .mood-categories { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+        .mood-tag {
+            padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;
+            background: rgba(108,99,255,0.1); color: var(--primary);
+        }
+        .no-data-msg { text-align: center; padding: 32px; color: var(--text-muted); font-size: 14px; }
+        @media (max-width: 700px) {
+            .profile-grid, .charts-row { grid-template-columns: 1fr; }
+            .profile-hero { flex-direction: column; text-align: center; padding: 28px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand">JSPM Wagholi</a>
+        <div class="navbar-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('campus_map') }}">Campus Map</a>
+            <a href="{{ url_for('lost_found') }}">Lost &amp; Found</a>
+            <a href="{{ url_for('feedback_poll') }}">Feedback</a>
+            <a href="{{ url_for('profile') }}" style="color: var(--primary);">My Profile</a>
+            <a href="{{ url_for('contact_page') }}">Contact</a>
+            {% if session.get('role') == 'admin' %}
+            <a href="{{ url_for('admin_panel') }}">Admin</a>
+            {% endif %}
+            <button class="theme-toggle" onclick="toggleTheme()">&#9790;</button>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="profile-page">
+        <!-- Hero card -->
+        <div class="profile-hero">
+            <div class="profile-avatar">&#128100;</div>
+            <div class="profile-hero-info">
+                <h2>{{ user.username }}</h2>
+                <p>{{ user.email }}</p>
+                <span class="join-date">Member since {{ user.created_at[:10] if user.created_at else 'N/A' }}</span>
+            </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="profile-grid">
+            <div class="stat-card">
+                <div class="stat-icon">&#127979;</div>
+                <h4>Campus Queries</h4>
+                <div class="stat-value">{{ campus_count }}</div>
+                <p>Messages sent to CampusConnect AI</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">&#128155;</div>
+                <h4>MindMate Chats</h4>
+                <div class="stat-value">{{ mindmate_count }}</div>
+                <p>Conversations with MindMate AI</p>
+            </div>
+        </div>
+
+        <!-- Mood charts -->
+        <div class="charts-row">
+            <div class="chart-card">
+                <h3>&#128200; Mood Trend — Last 7 Days</h3>
+                <div id="weeklyChartWrap">
+                    <canvas id="weeklyMoodChart" height="120"></canvas>
+                </div>
+                <div id="weeklyNoData" class="no-data-msg" style="display:none;">
+                    No mood data yet. Start chatting with MindMate to see your mood trend!
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>&#129765; Mood Distribution</h3>
+                <div id="distChartWrap">
+                    <canvas id="distMoodChart"></canvas>
+                </div>
+                <div id="distNoData" class="no-data-msg" style="display:none;">
+                    No mood logs yet.
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-card" id="moodTagsCard" style="display:none;">
+            <h3>&#127775; Detected Mood Categories</h3>
+            <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;">All moods detected across your MindMate sessions</p>
+            <div class="mood-categories" id="moodTagsContainer"></div>
+        </div>
+    </div>
+
+    {% include 'footer_wagholi.html' %}
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/session_timeout.js') }}"></script>
+    <script>
+        const MOOD_COLORS = {
+            happy:      '#48BB78',
+            sad:        '#63B3ED',
+            anxious:    '#F6AD55',
+            stressed:   '#FC8181',
+            lonely:     '#B794F4',
+            angry:      '#FC8181',
+            neutral:    '#CBD5E0',
+            hopeful:    '#68D391',
+            overwhelmed:'#FBD38D',
+            depressed:  '#90CDF4'
+        };
+
+        async function loadMoodData() {
+            try {
+                const res = await fetch('/api/mood-data');
+                const data = await res.json();
+
+                // Weekly chart
+                const weekly = data.weekly || [];
+                if (weekly.length === 0) {
+                    document.getElementById('weeklyChartWrap').style.display = 'none';
+                    document.getElementById('weeklyNoData').style.display = 'block';
+                } else {
+                    const dates = [...new Set(weekly.map(r => r.date))].sort();
+                    const categories = [...new Set(weekly.map(r => r.category))];
+                    const datasets = categories.map(cat => ({
+                        label: cat.charAt(0).toUpperCase() + cat.slice(1),
+                        data: dates.map(d => {
+                            const row = weekly.find(r => r.date === d && r.category === cat);
+                            return row ? row.count : 0;
+                        }),
+                        borderColor: MOOD_COLORS[cat] || '#6C63FF',
+                        backgroundColor: (MOOD_COLORS[cat] || '#6C63FF') + '22',
+                        fill: false, tension: 0.4, pointRadius: 4
+                    }));
+                    new Chart(document.getElementById('weeklyMoodChart'), {
+                        type: 'line',
+                        data: { labels: dates, datasets },
+                        options: {
+                            responsive: true,
+                            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                            plugins: { legend: { position: 'bottom' } }
+                        }
+                    });
+                }
+
+                // Distribution chart
+                const dist = data.distribution || [];
+                if (dist.length === 0) {
+                    document.getElementById('distChartWrap').style.display = 'none';
+                    document.getElementById('distNoData').style.display = 'block';
+                } else {
+                    const labels = dist.map(r => r.category.charAt(0).toUpperCase() + r.category.slice(1));
+                    const counts = dist.map(r => r.count);
+                    const colors = dist.map(r => MOOD_COLORS[r.category] || '#6C63FF');
+                    new Chart(document.getElementById('distMoodChart'), {
+                        type: 'doughnut',
+                        data: { labels, datasets: [{ data: counts, backgroundColor: colors, borderWidth: 2 }] },
+                        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+                    });
+
+                    // Tags
+                    const tagsCard = document.getElementById('moodTagsCard');
+                    const container = document.getElementById('moodTagsContainer');
+                    tagsCard.style.display = 'block';
+                    container.innerHTML = dist.map(r =>
+                        `<span class="mood-tag" style="background:${(MOOD_COLORS[r.category]||'#6C63FF')}22;color:${MOOD_COLORS[r.category]||'#6C63FF'}">${r.category} (${r.count})</span>`
+                    ).join('');
+                }
+            } catch (err) {
+                document.getElementById('weeklyChartWrap').style.display = 'none';
+                document.getElementById('weeklyNoData').style.display = 'block';
+                document.getElementById('distChartWrap').style.display = 'none';
+                document.getElementById('distNoData').style.display = 'block';
+            }
+        }
+
+        loadMoodData();
+    </script>
+</body>
+</html>

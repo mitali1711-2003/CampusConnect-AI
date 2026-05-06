@@ -123,6 +123,59 @@ def init_db():
         )
     ''')
 
+    # Lost & Found board
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS lost_found (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            post_type TEXT NOT NULL CHECK(post_type IN ('lost', 'found')),
+            item_name TEXT NOT NULL,
+            description TEXT,
+            location TEXT,
+            contact_info TEXT NOT NULL,
+            is_resolved INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    ''')
+
+    # Canteen menu of the day
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS canteen_menu (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            menu_date TEXT NOT NULL,
+            category TEXT NOT NULL CHECK(category IN ('breakfast', 'lunch', 'snacks', 'dinner')),
+            item_name TEXT NOT NULL,
+            price TEXT DEFAULT '',
+            is_available INTEGER DEFAULT 1,
+            updated_by TEXT DEFAULT 'admin',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Anonymous faculty feedback poll (no user_id by design)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS faculty_feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            subject TEXT NOT NULL,
+            faculty_name TEXT NOT NULL,
+            rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),
+            comment TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # MindMate mood logs (per-user, per-message)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS mood_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            category TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    ''')
+
     conn.commit()
     conn.close()
 

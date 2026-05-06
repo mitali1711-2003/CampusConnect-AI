@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost &amp; Found — JSPM Wagholi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .lf-page { max-width: 1100px; margin: 40px auto; padding: 0 24px; }
+        .lf-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+        .lf-header h2 {
+            font-size: 28px; font-weight: 800;
+            background: linear-gradient(135deg, #6C63FF, #FF6B9D);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .lf-header p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+        .lf-filters { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+        .filter-btn {
+            padding: 8px 18px; border-radius: 20px; border: 2px solid var(--border-light);
+            background: transparent; cursor: pointer; font-size: 13px; font-weight: 600;
+            color: var(--text-muted); transition: all 0.2s;
+        }
+        .filter-btn.active, .filter-btn:hover {
+            border-color: var(--primary); color: var(--primary); background: rgba(108,99,255,0.07);
+        }
+        .filter-btn.lost.active { border-color: #FC8181; color: #C53030; background: rgba(252,129,129,0.1); }
+        .filter-btn.found.active { border-color: #68D391; color: #276749; background: rgba(104,211,145,0.1); }
+        .lf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .lf-card {
+            background: var(--card-light); border-radius: var(--radius-lg); padding: 20px 22px;
+            box-shadow: var(--shadow); border-top: 4px solid transparent; transition: transform 0.2s;
+        }
+        .lf-card:hover { transform: translateY(-2px); }
+        .lf-card.lost { border-top-color: #FC8181; }
+        .lf-card.found { border-top-color: #68D391; }
+        .lf-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+        .lf-card h4 { font-size: 16px; font-weight: 700; margin: 0; }
+        .type-badge {
+            padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: 700;
+            text-transform: uppercase; flex-shrink: 0;
+        }
+        .type-badge.lost { background: rgba(252,129,129,0.15); color: #C53030; }
+        .type-badge.found { background: rgba(104,211,145,0.15); color: #276749; }
+        .lf-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .lf-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5; }
+        .lf-contact { font-size: 13px; font-weight: 600; }
+        .lf-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light); }
+        .lf-posted-by { font-size: 11px; color: var(--text-muted); }
+        .resolve-btn {
+            font-size: 11px; padding: 5px 12px; border-radius: 10px; border: none; cursor: pointer;
+            background: rgba(104,211,145,0.15); color: #276749; font-weight: 600; transition: background 0.2s;
+        }
+        .resolve-btn:hover { background: rgba(104,211,145,0.3); }
+        .empty-state { text-align: center; padding: 60px 24px; color: var(--text-muted); }
+        .empty-state .empty-icon { font-size: 56px; margin-bottom: 16px; }
+        .empty-state p { font-size: 15px; }
+        /* Post modal */
+        .post-form { display: grid; gap: 14px; }
+        .type-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .type-option {
+            border: 2px solid var(--border-light); border-radius: var(--radius); padding: 14px;
+            cursor: pointer; text-align: center; transition: all 0.2s; font-weight: 600; font-size: 14px;
+        }
+        .type-option:hover { border-color: var(--primary); }
+        .type-option.selected.lost { border-color: #FC8181; background: rgba(252,129,129,0.08); color: #C53030; }
+        .type-option.selected.found { border-color: #68D391; background: rgba(104,211,145,0.08); color: #276749; }
+        .success-banner {
+            display: none; background: #C6F6D5; border-radius: var(--radius);
+            padding: 12px 16px; color: #276749; font-weight: 600; margin-bottom: 16px; font-size: 14px;
+        }
+        @media (max-width: 600px) { .lf-grid { grid-template-columns: 1fr; } .lf-header { flex-direction: column; align-items: flex-start; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand">JSPM Wagholi</a>
+        <div class="navbar-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('campus_map') }}">Campus Map</a>
+            <a href="{{ url_for('lost_found') }}" style="color: var(--primary);">Lost &amp; Found</a>
+            <a href="{{ url_for('feedback_poll') }}">Feedback</a>
+            <a href="{{ url_for('profile') }}">My Profile</a>
+            <a href="{{ url_for('contact_page') }}">Contact</a>
+            {% if session.get('role') == 'admin' %}
+            <a href="{{ url_for('admin_panel') }}">Admin</a>
+            {% endif %}
+            <button class="theme-toggle" onclick="toggleTheme()">&#9790;</button>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="lf-page">
+        <div class="lf-header">
+            <div>
+                <h2>&#128269; Lost &amp; Found Board</h2>
+                <p>Lost something on campus? Found an item? Post here to connect with fellow students.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openPostModal()">+ Post an Item</button>
+        </div>
+
+        <div id="successBanner" class="success-banner">Your post has been submitted successfully!</div>
+
+        <div class="lf-filters">
+            <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">All Items</button>
+            <button class="filter-btn lost" data-filter="lost" onclick="setFilter('lost', this)">&#128683; Lost</button>
+            <button class="filter-btn found" data-filter="found" onclick="setFilter('found', this)">&#10003; Found</button>
+        </div>
+
+        <div class="lf-grid" id="lfGrid">
+            {% if items %}
+                {% for item in items %}
+                <div class="lf-card {{ item.post_type }}" data-type="{{ item.post_type }}" data-id="{{ item.id }}">
+                    <div class="lf-card-top">
+                        <h4>{{ item.item_name }}</h4>
+                        <span class="type-badge {{ item.post_type }}">{{ item.post_type }}</span>
+                    </div>
+                    <div class="lf-meta">
+                        {% if item.location %}<span>&#128205; {{ item.location }}</span>{% endif %}
+                        <span>&#128197; {{ item.created_at[:10] if item.created_at else '' }}</span>
+                    </div>
+                    {% if item.description %}
+                    <p class="lf-desc">{{ item.description }}</p>
+                    {% endif %}
+                    <div class="lf-contact">&#128222; {{ item.contact_info }}</div>
+                    <div class="lf-footer">
+                        <span class="lf-posted-by">Posted by {{ item.username }}</span>
+                        <button class="resolve-btn" onclick="resolveItem({{ item.id }}, this)">&#10003; Mark Resolved</button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state" id="emptyState" style="grid-column: 1/-1;">
+                    <div class="empty-icon">&#128269;</div>
+                    <p>No active posts yet. Be the first to post!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% include 'footer_wagholi.html' %}
+
+    <!-- Post Modal -->
+    <div class="modal-overlay" id="postModal">
+        <div class="modal" style="max-width: 520px;">
+            <h3>Post an Item</h3>
+            <div class="post-form">
+                <div>
+                    <label style="font-size:13px; font-weight:600; margin-bottom:8px; display:block;">Type</label>
+                    <div class="type-selector">
+                        <div class="type-option selected lost" id="typeLost" onclick="selectType('lost')">&#128683; I Lost Something</div>
+                        <div class="type-option found" id="typeFound" onclick="selectType('found')">&#10003; I Found Something</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Item Name <span style="color:#FC8181">*</span></label>
+                    <input type="text" id="itemName" placeholder="e.g. Blue water bottle, ID card, Laptop bag">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="itemDesc" placeholder="Any identifying details — colour, brand, distinguishing marks..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" id="itemLocation" placeholder="e.g. Library 2nd floor, Canteen, A-Block">
+                </div>
+                <div class="form-group">
+                    <label>Contact Info <span style="color:#FC8181">*</span></label>
+                    <input type="text" id="itemContact" placeholder="Phone number or email">
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closePostModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="submitPost()">Submit Post</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/session_timeout.js') }}"></script>
+    <script>
+        let selectedType = 'lost';
+        let currentFilter = 'all';
+        const CURRENT_USER = "{{ username }}";
+
+        function selectType(type) {
+            selectedType = type;
+            document.getElementById('typeLost').className = 'type-option' + (type === 'lost' ? ' selected lost' : '');
+            document.getElementById('typeFound').className = 'type-option' + (type === 'found' ? ' selected found' : '');
+        }
+
+        function setFilter(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.lf-card').forEach(card => {
+                card.style.display = (filter === 'all' || card.dataset.type === filter) ? '' : 'none';
+            });
+        }
+
+        function openPostModal() { document.getElementById('postModal').classList.add('active'); }
+        function closePostModal() { document.getElementById('postModal').classList.remove('active'); }
+
+        async function submitPost() {
+            const itemName = document.getElementById('itemName').value.trim();
+            const contact = document.getElementById('itemContact').value.trim();
+            if (!itemName || !contact) {
+                alert('Item name and contact info are required.');
+                return;
+            }
+            const payload = {
+                post_type: selectedType,
+                item_name: itemName,
+                description: document.getElementById('itemDesc').value.trim(),
+                location: document.getElementById('itemLocation').value.trim(),
+                contact_info: contact
+            };
+            try {
+                const res = await fetch('/api/lost-found', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    closePostModal();
+                    document.getElementById('itemName').value = '';
+                    document.getElementById('itemDesc').value = '';
+                    document.getElementById('itemLocation').value = '';
+                    document.getElementById('itemContact').value = '';
+                    document.getElementById('successBanner').style.display = 'block';
+                    setTimeout(() => { document.getElementById('successBanner').style.display = 'none'; }, 4000);
+                    addCardToGrid(payload);
+                } else {
+                    alert(data.error || 'Failed to submit post.');
+                }
+            } catch (e) {
+                alert('Network error. Please try again.');
+            }
+        }
+
+        function addCardToGrid(payload) {
+            const grid = document.getElementById('lfGrid');
+            const empty = document.getElementById('emptyState');
+            if (empty) empty.remove();
+            const today = new Date().toISOString().slice(0, 10);
+            const card = document.createElement('div');
+            card.className = `lf-card ${payload.post_type}`;
+            card.dataset.type = payload.post_type;
+            card.innerHTML = `
+                <div class="lf-card-top">
+                    <h4>${escHtml(payload.item_name)}</h4>
+                    <span class="type-badge ${payload.post_type}">${payload.post_type}</span>
+                </div>
+                <div class="lf-meta">
+                    ${payload.location ? `<span>&#128205; ${escHtml(payload.location)}</span>` : ''}
+                    <span>&#128197; ${today}</span>
+                </div>
+                ${payload.description ? `<p class="lf-desc">${escHtml(payload.description)}</p>` : ''}
+                <div class="lf-contact">&#128222; ${escHtml(payload.contact_info)}</div>
+                <div class="lf-footer">
+                    <span class="lf-posted-by">Posted by ${escHtml(CURRENT_USER)}</span>
+                </div>
+            `;
+            grid.prepend(card);
+        }
+
+        async function resolveItem(itemId, btn) {
+            if (!confirm('Mark this item as resolved? It will be removed from the board.')) return;
+            try {
+                const res = await fetch(`/api/lost-found/${itemId}/resolve`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    btn.closest('.lf-card').style.transition = 'opacity 0.4s';
+                    btn.closest('.lf-card').style.opacity = '0';
+                    setTimeout(() => btn.closest('.lf-card').remove(), 400);
+                } else {
+                    alert(data.error || 'Could not resolve item.');
+                }
+            } catch (e) {
+                alert('Network error.');
+            }
+        }
+
+        function escHtml(s) {
+            return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        document.getElementById('postModal').addEventListener('click', function(e) {
+            if (e.target === this) closePostModal();
+        });
+    </script>
+</body>
+</html>
