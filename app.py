@@ -274,6 +274,12 @@ def campus_map():
     return render_template('campus_map.html')
 
 
+@app.route('/academic-calendar')
+@login_required
+def academic_calendar():
+    return render_template('academic_calendar.html')
+
+
 _MARKERS_PKG  = os.path.join(os.path.dirname(__file__), 'database', 'campus_markers.json')
 _MARKERS_TMP  = '/tmp/campus_markers.json'
 # On Vercel the package filesystem is read-only; edits go to /tmp

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Calendar 2025–26 — JSPM Wagholi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .calendar-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark, #1a56a0) 100%);
+            color: #fff;
+            padding: 2rem 1.5rem 1.5rem;
+            text-align: center;
+        }
+        .calendar-header h1 { margin: 0 0 .4rem; font-size: 1.6rem; }
+        .calendar-header p  { margin: 0; opacity: .88; font-size: .95rem; }
+
+        .calendar-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .75rem;
+            padding: .9rem 1.5rem;
+            background: var(--card-bg, #fff);
+            border-bottom: 1px solid var(--border, #e2e8f0);
+            flex-wrap: wrap;
+        }
+        .calendar-toolbar span { font-size: .88rem; color: var(--text-secondary, #64748b); }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            padding: .55rem 1.2rem;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: .9rem;
+            text-decoration: none;
+            transition: opacity .2s;
+        }
+        .download-btn:hover { opacity: .85; }
+
+        .pdf-container {
+            width: 100%;
+            height: calc(100vh - 210px);
+            min-height: 500px;
+            background: #f1f5f9;
+        }
+        .pdf-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Fallback card shown when iframe is blocked */
+        .pdf-fallback {
+            display: none;
+            max-width: 520px;
+            margin: 4rem auto;
+            text-align: center;
+            padding: 2.5rem 2rem;
+            background: var(--card-bg, #fff);
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.08);
+        }
+        .pdf-fallback .fallback-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+        .pdf-fallback h3 { margin: 0 0 .6rem; color: var(--text, #1e293b); }
+        .pdf-fallback p  { color: var(--text-secondary, #64748b); margin-bottom: 1.4rem; }
+
+        @media (max-width: 600px) {
+            .calendar-header h1 { font-size: 1.25rem; }
+            .pdf-container { height: calc(100vh - 240px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand">JSPM Wagholi</a>
+        <div class="navbar-links">
+            <a href="{{ url_for('campus_map') }}">Campus Map</a>
+            <a href="{{ url_for('academic_calendar') }}" class="active">Academic Calendar</a>
+            <a href="{{ url_for('lost_found') }}">Lost &amp; Found</a>
+            <a href="{{ url_for('feedback_poll') }}">Feedback</a>
+            <a href="{{ url_for('profile') }}">My Profile</a>
+            <a href="{{ url_for('contact_page') }}">Contact</a>
+            {% if session.get('role') == 'admin' %}
+            <a href="{{ url_for('admin_panel') }}">Admin</a>
+            {% endif %}
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">&#9790;</button>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="calendar-header">
+        <h1>&#128197; Academic Calendar 2025–26</h1>
+        <p>JSPM University — Wagholi Campus &nbsp;|&nbsp; SY / TY / BY (Updated)</p>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="calendar-toolbar">
+        <span>&#128203; Academic Calendar — Second Year, Third Year &amp; Final Year &nbsp;|&nbsp; 2025–26</span>
+        <a class="download-btn"
+           href="{{ url_for('static', filename='docs/academic_calendar_2025_26.pdf') }}"
+           download="Academic_Calendar_JSPM_2025_26.pdf">
+            &#11015; Download PDF
+        </a>
+    </div>
+
+    <!-- PDF Viewer -->
+    <div class="pdf-container" id="pdfContainer">
+        <iframe
+            id="pdfFrame"
+            src="{{ url_for('static', filename='docs/academic_calendar_2025_26.pdf') }}#toolbar=1&navpanes=0&scrollbar=1"
+            title="Academic Calendar 2025-26">
+        </iframe>
+    </div>
+
+    <!-- Fallback (shown if iframe fails on mobile/some browsers) -->
+    <div class="pdf-fallback" id="pdfFallback">
+        <div class="fallback-icon">&#128203;</div>
+        <h3>Open in PDF viewer</h3>
+        <p>Your browser may not support inline PDF viewing. Download the file to read it.</p>
+        <a class="download-btn"
+           href="{{ url_for('static', filename='docs/academic_calendar_2025_26.pdf') }}"
+           download="Academic_Calendar_JSPM_2025_26.pdf">
+            &#11015; Download PDF
+        </a>
+    </div>
+
+    {% include 'footer_wagholi.html' %}
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/session_timeout.js') }}"></script>
+    <script>
+        // Show fallback if iframe fails to load the PDF
+        const frame = document.getElementById('pdfFrame');
+        frame.addEventListener('error', showFallback);
+        // Extra check: if src is empty or blocked after 4s on mobile
+        setTimeout(function() {
+            try {
+                const doc = frame.contentDocument || frame.contentWindow.document;
+                if (!doc || doc.body.innerHTML === '') showFallback();
+            } catch(e) { /* cross-origin — iframe loaded fine */ }
+        }, 4000);
+
+        function showFallback() {
+            document.getElementById('pdfContainer').style.display = 'none';
+            document.getElementById('pdfFallback').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

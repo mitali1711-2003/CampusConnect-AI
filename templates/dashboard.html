@@ -14,6 +14,7 @@
         <a href="{{ url_for('dashboard') }}" class="navbar-brand">JSPM Wagholi</a>
         <div class="navbar-links">
             <a href="{{ url_for('campus_map') }}">Campus Map</a>
+            <a href="{{ url_for('academic_calendar') }}">Academic Calendar</a>
             <a href="{{ url_for('lost_found') }}" id="tour-lost-found">Lost &amp; Found</a>
             <a href="{{ url_for('feedback_poll') }}">Feedback</a>
             <a href="{{ url_for('profile') }}">My Profile</a>
@@ -73,6 +74,15 @@
                 <h3>MindMate AI</h3>
                 <p>Your friendly emotional support companion. Talk about stress, anxiety, loneliness, academic pressure, or just chat. I'm here to listen, pookie! &#128155;</p>
                 <button class="btn">Talk to MindMate &#8594;</button>
+            </div>
+
+            <!-- Academic Calendar Card -->
+            <div class="bot-card" style="border-top:4px solid #f59e0b;"
+                 onclick="window.location.href='{{ url_for('academic_calendar') }}'">
+                <div class="bot-card-icon">&#128197;</div>
+                <h3>Academic Calendar</h3>
+                <p>View the official JSPM Wagholi Academic Calendar for SY, TY &amp; BY (2025–26). Download the PDF for exam schedules, holidays, and key dates.</p>
+                <button class="btn" style="background:var(--warning,#f59e0b);border-color:var(--warning,#f59e0b);">View Calendar &#8594;</button>
             </div>
         </div>
     </div>
